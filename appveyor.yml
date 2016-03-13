@@ -8,30 +8,32 @@ environment:
     - PYTHON: "C:\\Python35-x64"
 
 install:
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+
   # Check that we have the expected version and architecture for Python
-  - "%PYTHON%\\python.exe --version"
-  - "%PYTHON%\\python.exe -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
-  - "%PYTHON%\\python.exe -m pip install --disable-pip-version-check --upgrade pip"
+  - "pip install --disable-pip-version-check --upgrade pip"
 
   # Install AtlassianBot requirements
-  - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
+  - "pip install -r requirements.txt"
 
   # Install CodeCov requirements
-  - "%PYTHON%\\python.exe -m pip install codecov"
+  - "pip install codecov"
 
 build: off
 
 test_script:
   - "COPY plugins\\settings-sample.yml plugins\\settings.yml"
-  - "%PYTHON%\\python.exe -m coverage run --source=plugins,utils -m py.test -vv tests/"
+  - "coverage run --source=plugins,utils -m py.test -vv tests/"
 
 after_test:
-  - "%PYTHON%\\python.exe -m coverage report"
-  - "%PYTHON%\\python.exe -m coverage html -d coverage_html"
-  - codecov
+  - "coverage report"
+  - "coverage html -d coverage_html"
+  - "codecov"
 
 artifacts:
   - path: coverage_html\*
