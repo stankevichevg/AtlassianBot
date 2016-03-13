@@ -2,11 +2,9 @@ environment:
 
   matrix:
 
-    - PYTHON: "C:\\Python27"
     - PYTHON: "C:\\Python33"
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python27-x64"
     - PYTHON: "C:\\Python33-x64"
       DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python34-x64"
@@ -15,8 +13,8 @@ environment:
 
 install:
   # Check that we have the expected version and architecture for Python
-  - "python --version"
-  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - "%PYTHON%\\python.exe --version"
+  - "%PYTHON%\\python.exe -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Upgrade to the latest version of pip to avoid it displaying warnings
   # about it being out of date.
@@ -31,6 +29,7 @@ install:
 build: off
 
 test_script:
+  - "COPY plugins\\settings-sample.yml plugins\\settings.yml"
   - "%PYTHON%\\python.exe -m coverage run --source=plugins,utils -m py.test -vv tests/"
 
 after_test:
