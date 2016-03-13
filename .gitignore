@@ -1,0 +1,7 @@
+venv/
+*.pyc
+local_settings.py
+plugins/settings.yml
+*.sublime-*
+coverage_html
+.coverage

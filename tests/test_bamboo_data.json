@@ -1,0 +1,173 @@
+{
+  "move_plan_notexist":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/plan/BAMA-DEV",
+        "code": 404
+      }
+    ],
+
+    "result": ["Plan BAMA-DEV doesn't exists"]
+  },
+  "move_plan_notadmin":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/plan/BAMA-DEV",
+        "code": 200
+      },
+      {
+        "url": "http://host/build/admin/ajax/getDashboardSummary.action",
+        "code": 403
+      }
+    ],
+
+    "result":
+    [
+      "Yes my lord. I'm looking for jobs to move...",
+      "I'm not a Bamboo administrator and cannot move jobs"
+    ]
+  },
+  "move_plan_notinqueue":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/plan/BAMA-DEV",
+        "code": 200
+      },
+      {
+        "url": "http://host/build/admin/ajax/getDashboardSummary.action",
+        "code": 200,
+        "text":
+        {
+          "status":"OK",
+          "builds": []
+        }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for jobs to move...",
+      "Plan BAMA-DEV not found in queue"
+    ]
+  },
+  "move_plan_planexist_error":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/plan/BAMA-DEV",
+        "code": 403
+      }
+    ]
+  },
+  "move_plan_builds_error":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/plan/BAMA-DEV",
+        "code": 200
+      },
+      {
+        "url": "http://host/build/admin/ajax/getDashboardSummary.action",
+        "code": 500
+      }
+    ]
+  },
+  "move_plan_inqueue":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/plan/BAMA-DEV",
+        "code": 200
+      },
+      {
+        "url": "http://host/build/admin/ajax/getDashboardSummary.action",
+        "code": 200,
+        "text":
+        {
+          "status":"OK",
+          "builds":
+          [
+            {
+              "status":"QUEUED",
+              "resultKey":"BAMX-DEV-JOB1-1",
+              "planKey":"BAMX-DEV",
+              "queueIndex":1
+            },
+            {
+              "status":"QUEUED",
+              "resultKey":"BAMA-DEV-JOB1-1",
+              "planKey":"BAMA-DEV",
+              "queueIndex":2
+            },
+            {
+              "status":"QUEUED",
+              "resultKey":"BAMA-DEV-JOB2-1",
+              "planKey":"BAMA-DEV",
+              "queueIndex":3
+            }
+          ]
+        }
+      }
+    ],
+    "post_result":
+    [
+      "resultKey=BAMA-DEV-JOB2-1&prevResultKey=&itemType=BUILD",
+      "resultKey=BAMA-DEV-JOB1-1&prevResultKey=&itemType=BUILD"
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for jobs to move...",
+      "Moved 2 jobs"
+    ]
+  },
+  "find_matching_branches":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=search&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text":
+        {
+          "searchResults":
+          [
+            {
+              "searchEntity":
+              {
+                "id": "BAMA-DEV123",
+                "planName": "Project - develop",
+                "branchName": "branch"
+              }
+            }
+          ]
+        }
+      }
+    ],
+
+    "plankey": "BAMA-DEV",
+    "searched_term": "search",
+
+    "result": ["BAMA-DEV123", "Project - develop/branch"]
+  },
+  "find_matching_branches500":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=search&masterPlanKey=BAMA-DEV",
+        "code": 500
+      }
+    ],
+
+    "plankey": "BAMA-DEV",
+    "searched_term": "search"
+  }
+}

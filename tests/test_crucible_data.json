@@ -1,0 +1,195 @@
+{
+  "display_reviews_CRUA-1":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-1",
+        "code": 200,
+        "text":
+        {
+          "permaId":{"id":"CRUA-1"},
+          "name":"CRUA-1 name"
+        }
+      },
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-1/reviewers/uncompleted",
+        "code": 200,
+        "text":
+        {
+          "reviewer":
+          [
+            {"userName":"user1"},
+            {"userName":"user2"}
+          ]
+        }
+      }
+    ],
+
+    "result":
+    [
+      {
+        "author_link": "http://host/cru/CRUA-1",
+        "color": "#4a6785",
+        "text": "CRUA-1 name",
+        "author_name": "CRUA-1",
+        "fields": [{"short": false, "value": "<@user1> <@user2>", "title": "Uncompleted reviewers"}],
+        "fallback": "CRUA-1 - CRUA-1 name\nhttp://host/cru/CRUA-1\nUncompleted reviewers: <@user1>, <@user2>"
+      }
+    ]
+  },
+  "display_reviews_CRUA-11":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-1",
+        "code": 200,
+        "text":
+        {
+          "permaId":{"id":"CRUA-1"},
+          "name":"CRUA-1 name"
+        }
+      },
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-1/reviewers/uncompleted",
+        "code": 200,
+        "text":
+        {
+          "reviewer":
+          [
+            {"userName":"user1"},
+            {"userName":"user2"}
+          ]
+        }
+      }
+    ],
+
+    "result":
+    [
+      {
+        "author_link": "http://host/cru/CRUA-1",
+        "color": "#4a6785",
+        "text": "CRUA-1 name",
+        "author_name": "CRUA-1",
+        "fields": [{"short": false, "value": "<@user1> <@user2>", "title": "Uncompleted reviewers"}],
+        "fallback": "CRUA-1 - CRUA-1 name\nhttp://host/cru/CRUA-1\nUncompleted reviewers: <@user1>, <@user2>"
+      }
+    ]
+  },
+  "display_reviews_CRUA-2":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-2",
+        "code": 404
+      }
+    ],
+
+    "result":
+    [
+      {
+        "color": "warning",
+        "text": ":exclamation: Review not found",
+        "fallback": "Review CRUA-2 not found", "author_name": "CRUA-2"
+      }
+    ]
+  },
+  "display_reviews_CRUA-1&2":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-1",
+        "code": 200,
+        "text":
+        {
+          "permaId":{"id":"CRUA-1"},
+          "name":"CRUA-1 name"
+        }
+      },
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-2",
+        "code": 404
+      },
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-1/reviewers/uncompleted",
+        "code": 200,
+        "text":
+        {
+          "reviewer":
+          [
+            {"userName":"user1"},
+            {"userName":"user2"}
+          ]
+        }
+      }
+    ],
+    "result":
+    [
+      {
+        "author_link": "http://host/cru/CRUA-1",
+        "color": "#4a6785",
+        "text": "CRUA-1 name",
+        "author_name": "CRUA-1",
+        "fields": [{"short": false, "value": "<@user1> <@user2>", "title": "Uncompleted reviewers"}],
+        "fallback": "CRUA-1 - CRUA-1 name\nhttp://host/cru/CRUA-1\nUncompleted reviewers: <@user1>, <@user2>"
+      },
+      {
+        "color": "warning",
+        "text": ":exclamation: Review not found",
+        "fallback": "Review CRUA-2 not found", "author_name": "CRUA-2"
+      }
+   ]
+  },
+  "display_reviews_CRUA-3-error1":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-3",
+        "code": 403
+      }
+    ]
+  },
+  "display_reviews_CRUA-3-error2":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/reviews-v1/CRUA-3",
+        "code": 401
+      }
+    ]
+  },
+  "get_reviews_from_jira":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRAA-1",
+        "code": 200,
+        "text":
+        {
+          "reviewData":
+          [
+            {"permaId":{"id":"CRUA-1"}},
+            {"permaId":{"id":"CRUB-2"}}
+          ]
+        }
+      }
+    ],
+    "result": ["CRUA-1", "CRUB-2"]
+  },
+  "get_reviews_from_jira-error":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRAA-2",
+        "code": 403
+      }
+    ]
+  }
+}

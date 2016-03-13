@@ -1,0 +1,57 @@
+---
+plugins:
+  jirabot:
+    enabled: No
+    prefixes: [ PROJECTKEY1, PROJECTKEY2 ]
+
+  jiranotifier:
+    enabled: No
+    polling_interval: 15
+    notifiers:
+    - query: project = PROJECTKEY AND issuetype NOT IN subtaskIssueTypes()
+      channel: channel
+
+  bamboobot:
+    enabled: No
+    prefixes: [ PLANKEY1, PLANKEY2 ]
+    allowedusers: []
+
+  cruciblebot:
+    enabled: No
+    prefixes: [ REVIEWKEY1, REVIEWKEY2 ]
+
+  cleanbot:
+    enabled: No
+    # Only one is supported for now
+    searches:
+    - stash:
+        project: KEY1
+        repos: [ REPO1, REPO2 ]
+        basebranches: [ refs/heads/master, refs/heads/develop ]
+      bamboo:
+        plans: [ PLANKEY1, PLANKEY2 ]
+      allowedusers: []
+      folders: []
+
+servers:
+  verify_ssl: No
+
+  jira:
+    host: https://server
+    username: &default_username username
+    password: &default_password password
+
+  bamboo:
+    host: https://server
+    username: *default_username
+    password: *default_password
+
+  crucible:
+    host: https://server
+    username: *default_username
+    password: *default_password
+
+  stash:
+    host: https://server
+    username: *default_username
+    password: *default_password

@@ -1,0 +1,530 @@
+{
+  "cleanbot_issuenotfound":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-3?fields=status",
+        "code": 404,
+        "text": {}
+      },
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRA-3",
+        "code": 200,
+        "text": { "reviewData": [] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/branches?filterText=JIRA-3&limit=100&details=True",
+        "code": 200,
+        "text": { "values":[] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo2/branches?filterText=JIRA-3&limit=100&details=True",
+        "code": 200,
+        "text": { "values":[] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-3&masterPlanKey=BAMA-MASTER",
+        "code": 200,
+        "text": { "searchResults": [] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-3&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text": { "searchResults": [] }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for tasks...",
+      [
+        {"color": "danger", "text": "*Issue JIRA-3 not found.*", "author_name": "JIRA", "mrkdwn_in": ["text"]},
+        {"color": null, "text": "No linked reviews found.", "author_name": "CRUCIBLE"},
+        {"color": null, "text": "No linked Git branch to remove.", "author_name": "STASH"},
+        {"color": null, "text": "No linked Bamboo branch to remove.", "author_name": "BAMBOO"},
+        {"color": null, "text": "No folder to remove.", "author_name": "FOLDERS"}
+      ],
+      "There are errors. Clean cannot be performed"
+    ]
+  },
+
+  "cleanbot_canclean":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=status",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "status": { "name": "Open" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=summary%2Cissuetype",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "summary":"Issue JIRA-1",
+            "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/story.png" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRA-1",
+        "code": 200,
+        "text":
+        {
+          "reviewData":
+          [
+            {"permaId":{"id":"CRUA-1"}, "state": "Closed"}
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text":
+        {
+          "values":
+          [
+            {
+              "id":"refs/heads/JIRA-1-branchname",
+              "displayId":"story/JIRA-1-branchname",
+              "latestChangeset":"1c396d462e9c035121e8db672b7fe4566d34f0d0"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo2/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values": [] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/compare/changes/?to=refs%2Fheads%2Fmaster&from=refs%2Fheads%2FJIRA-1-branchname&limit=1",
+        "code": 200,
+        "text": { "size": 1 }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/compare/changes/?to=refs%2Fheads%2Fdevelop&from=refs%2Fheads%2FJIRA-1-branchname&limit=1",
+        "code": 200,
+        "text": { "size": 0 }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-MASTER",
+        "code": 200,
+        "text":
+        {
+          "searchResults": []
+        }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text":
+        {
+          "searchResults":
+          [
+            {
+              "searchEntity":
+              {
+                "id": "BAMA-DEV123",
+                "planName": "Project - develop",
+                "branchName": "branch"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for tasks...",
+      [
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://jira.atlassian.com/images/icons/issuetypes/story.png"},
+        {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
+        {"color": null, "text": "All linked reviews are closed.", "author_name": "CRUCIBLE"},
+        {"color": "good", "text": "Git branch repo1 story/JIRA-1-branchname will be removed.", "author_name": "STASH"},
+        {"color": "good", "text": "Bamboo branch Project - develop/branch will be removed.", "author_name": "BAMBOO"},
+        {"color": null, "text": "No folder to remove.", "author_name": "FOLDERS"}
+      ],
+      "Send 'CLEAN YES' to validate these changes"
+    ]
+  },
+
+  "cleanbot_reviewnotclosed":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=status",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "status": { "name": "Open" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=summary%2Cissuetype",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "summary":"Issue JIRA-1",
+            "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/story.png" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRA-1",
+        "code": 200,
+        "text":
+        {
+          "reviewData":
+          [
+            {"permaId":{"id":"CRUA-1"}, "state": "Open"}
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values":[] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo2/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values":[] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-MASTER",
+        "code": 200,
+        "text": { "searchResults": [] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text": { "searchResults": [] }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for tasks...",
+      [
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://jira.atlassian.com/images/icons/issuetypes/story.png"},
+        {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
+        {"color": "danger", "text": "*Review CRUA-1 is not closed.*", "author_name": "CRUCIBLE", "mrkdwn_in": ["text"]},
+        {"color": null, "text": "No linked Git branch to remove.", "author_name": "STASH"},
+        {"color": null, "text": "No linked Bamboo branch to remove.", "author_name": "BAMBOO"},
+        {"color": null, "text": "No folder to remove.", "author_name": "FOLDERS"}
+      ],
+      "There are errors. Clean cannot be performed"
+    ]
+  },
+
+  "cleanbot_branchnotmerged":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=status",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "status": { "name": "Open" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=summary%2Cissuetype",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "summary":"Issue JIRA-1",
+            "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/story.png" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRA-1",
+        "code": 200,
+        "text":
+        {
+          "reviewData": []
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text":
+        {
+          "values":
+          [
+            {
+              "id":"refs/heads/JIRA-1-branchname",
+              "displayId":"story/JIRA-1-branchname",
+              "latestChangeset":"1c396d462e9c035121e8db672b7fe4566d34f0d0"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo2/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values": [] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/compare/changes/?to=refs%2Fheads%2Fmaster&from=refs%2Fheads%2FJIRA-1-branchname&limit=1",
+        "code": 200,
+        "text": { "size": 1 }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/compare/changes/?to=refs%2Fheads%2Fdevelop&from=refs%2Fheads%2FJIRA-1-branchname&limit=1",
+        "code": 200,
+        "text": { "size": 1 }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-MASTER",
+        "code": 200,
+        "text": { "searchResults": [] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text": { "searchResults": [] }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for tasks...",
+      [
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://jira.atlassian.com/images/icons/issuetypes/story.png"},
+        {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
+        {"color": null, "text": "No linked reviews found.", "author_name": "CRUCIBLE"},
+        {"color": "danger", "text": "*Git branch repo1 story/JIRA-1-branchname is not merged.*", "author_name": "STASH", "mrkdwn_in": ["text"]},
+        {"color": null, "text": "No linked Bamboo branch to remove.", "author_name": "BAMBOO"},
+        {"color": null, "text": "No folder to remove.", "author_name": "FOLDERS"}
+      ],
+      "There are errors. Clean cannot be performed"
+    ]
+  },
+
+  "cleanbot_storyclosed":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=status",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "status": { "name": "Closed", "id": "6" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=summary%2Cissuetype",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "summary":"Issue JIRA-1",
+            "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/story.png" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRA-1",
+        "code": 200,
+        "text":
+        {
+          "reviewData": []
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values":[] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo2/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values":[] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-MASTER",
+        "code": 200,
+        "text": { "searchResults": [] }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text": { "searchResults": [] }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for tasks...",
+      [
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://jira.atlassian.com/images/icons/issuetypes/story.png"},
+        {"color": null, "text": "JIRA-1 already closed", "author_name": "JIRA"},
+        {"color": null, "text": "No linked reviews found.", "author_name": "CRUCIBLE"},
+        {"color": null, "text": "No linked Git branch to remove.", "author_name": "STASH"},
+        {"color": null, "text": "No linked Bamboo branch to remove.", "author_name": "BAMBOO"},
+        {"color": null, "text": "No folder to remove.", "author_name": "FOLDERS"}
+      ],
+      "Nothing to clean"
+    ]
+  },
+
+
+
+  "cleanbot_result1":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=status",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "status": { "name": "Closed" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest/api/2/issue/JIRA-1?fields=summary%2Cissuetype",
+        "code": 200,
+        "text":
+        {
+          "key":"JIRA-1",
+          "fields":
+          {
+            "summary":"Issue JIRA-1",
+            "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/story.png" }
+          }
+        }
+      },
+      {
+        "url": "http://host/rest-service/search-v1/reviewsForIssue?jiraKey=JIRA-1",
+        "code": 200,
+        "text":
+        {
+          "reviewData":
+          [
+            {"permaId":{"id":"CRUA-1"}, "state": "Closed"},
+            {"permaId":{"id":"CRUB-2"}, "state": "Open"}
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text":
+        {
+          "values":
+          [
+            {
+              "id":"refs/heads/JIRA-1-branchname",
+              "displayId":"story/JIRA-1-branchname",
+              "latestChangeset":"1c396d462e9c035121e8db672b7fe4566d34f0d0"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo2/branches?filterText=JIRA-1&limit=100&details=True",
+        "code": 200,
+        "text": { "values": [] }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/compare/changes/?to=refs%2Fheads%2Fmaster&from=refs%2Fheads%2FJIRA-1-branchname&limit=1",
+        "code": 200,
+        "text": { "size": 1 }
+      },
+      {
+        "url": "http://host/rest/api/1.0/projects/stashproject/repos/repo1/compare/changes/?to=refs%2Fheads%2Fdevelop&from=refs%2Fheads%2FJIRA-1-branchname&limit=1",
+        "code": 200,
+        "text": { "size": 1 }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-MASTER",
+        "code": 200,
+        "text":
+        {
+          "searchResults":
+          [
+            {
+              "searchEntity":
+              {
+                "id": "BAMA-MASTER123",
+                "planName": "Project - develop",
+                "branchName": "branch"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://host/rest/api/latest/search/branches?searchTerm=JIRA-1&masterPlanKey=BAMA-DEV",
+        "code": 200,
+        "text":
+        {
+          "searchResults":
+          [
+            {
+              "searchEntity":
+              {
+                "id": "BAMA-DEV123",
+                "planName": "Project - develop",
+                "branchName": "branch"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for tasks...",
+      [
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://jira.atlassian.com/images/icons/issuetypes/story.png"},
+        {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
+        {"color": "danger", "text": "*Review CRUB-2 is not closed.*", "author_name": "CRUCIBLE", "mrkdwn_in": ["text"]},
+        {"color": "danger", "text": "*Git branch repo1 story/JIRA-1-branchname is not merged.*", "author_name": "STASH", "mrkdwn_in": ["text"]},
+        {"color": "good", "text": "Bamboo branch Project - develop/branch will be removed.", "author_name": "BAMBOO"},
+        {"color": "good", "text": "Bamboo branch Project - develop/branch will be removed.", "author_name": "BAMBOO"},
+        {"color": null, "text": "No folder to remove.", "author_name": "FOLDERS"}
+      ],
+      "There are errors. Clean cannot be performed"
+    ]
+  }
+}
