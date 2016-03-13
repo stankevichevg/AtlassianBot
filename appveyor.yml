@@ -2,13 +2,9 @@ environment:
 
   matrix:
 
-    - PYTHON: "C:\\Python33"
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python33-x64"
-      DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python34-x64"
-      DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python35-x64"
 
 install:
@@ -24,7 +20,7 @@ install:
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
 
   # Install CodeCov requirements
-  - "pip install codecov"
+  - "%PYTHON%\\python.exe -m pip install codecov"
 
 build: off
 
@@ -35,7 +31,7 @@ test_script:
 after_test:
   - "%PYTHON%\\python.exe -m coverage report"
   - "%PYTHON%\\python.exe -m coverage html -d coverage_html"
-  - "codecov"
+  - "%PYTHON%\\codecov"
 
 artifacts:
   - path: coverage_html\*
