@@ -1,4 +1,8 @@
 # Atlassian Bot
+[![Build status](https://ci.appveyor.com/api/projects/status/iuqcblbxb9jyk2pb/branch/master?svg=true)](https://ci.appveyor.com/project/gpailler/atlassianbot/branch/master)
+[![codecov.io](https://codecov.io/github/gpailler/AtlassianBot/coverage.svg?branch=master)](https://codecov.io/github/gpailler/AtlassianBot?branch=master)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/gpailler/AtlassianBot/blob/master/LICENSE)
+
 Atlassian Bot is a collection of plugins to integrate Atlassian tools into Slack.
 
 
