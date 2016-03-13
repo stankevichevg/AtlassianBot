@@ -35,7 +35,7 @@ test_script:
 after_test:
   - "%PYTHON%\\python.exe -m coverage report"
   - "%PYTHON%\\python.exe -m coverage html -d coverage_html"
-  - "%PYTHON%\\python.exe -m codecov"
+  - "codecov"
 
 artifacts:
   - path: coverage_html\*
