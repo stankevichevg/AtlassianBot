@@ -24,7 +24,7 @@ install:
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
 
   # Install CodeCov requirements
-  - "%PYTHON%\\python.exe -m pip install codecov"
+  - "pip install codecov"
 
 build: off
 
