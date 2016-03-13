@@ -5,6 +5,7 @@ environment:
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python34-x64"
+      DISTUTILS_USE_SDK: "1"
     - PYTHON: "C:\\Python35-x64"
 
 install:
@@ -15,7 +16,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Install AtlassianBot requirements
-  - "pip install -r requirements.txt"
+  - "build.cmd pip install -r requirements.txt"
 
   # Install CodeCov requirements
   - "pip install codecov"
