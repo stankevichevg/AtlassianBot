@@ -33,4 +33,4 @@ test_script:
 
 after_test:
   - "coverage report"
-  - "codecov --env PYTHON_VERSION APPVEYOR_REPO_BRANCH --build \"%APPVEYOR_BUILD_NUMBER%_%APPVEYOR_REPO_BRANCH%_%PYTHON_VERSION%\""
+  - "codecov --env PYTHON_VERSION APPVEYOR_REPO_BRANCH"
