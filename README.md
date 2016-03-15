@@ -32,3 +32,12 @@ Copy `plugins/settings-sample.yml` to `plugins/settings.yml` and activate/config
 ```
 > python run.py
 ```
+
+## Plugins
+### JiraBot
+This plugin reads messages on channels on which he's invited and gives details when he finds a Jira key in a discussion. Displayed details are the summary the issue type. The message is a link to access issue on Jira.
+
+![jirabot](https://cloud.githubusercontent.com/assets/3621529/13786671/adcff88a-eb13-11e5-8de2-ec7814837382.jpg)
+
+### CrucibleBot
+This plugin reads messages on channels on which he's invited and gives details when he finds a Review key in a discussion. Displayed details are the summary and the uncompleted reviewers. The message is a link to access review on Crucible.
