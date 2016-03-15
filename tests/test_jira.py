@@ -64,10 +64,33 @@ def test_display_issues(bot, input, testdata):
         assert args[0] is ''
         assert json.loads(args[1]) == testdata['result']
 
-        # Second call should not display message again
-        message.send_webapi.reset_mock()
+
+@pytest.mark.parametrize('input,testdata', [
+                         ('JIRA-1', data['jirabot_result1']),
+                         ('JIRA-3', data['jirabot_notexist']),
+                         ])
+def test_messages_cache(bot, input, testdata):
+    with controlled_responses(testdata['requests']) as rsps:
+        rsps.rsps.add(
+            responses.POST,
+            'http://host/rest/auth/1/session',
+            status=200)
+
+        # First call should display message
+        message = get_message(input, channel='channel1')
+        bot.display_issues(message)
+        assert message.send_webapi.called
+
+        # Second call on same channel should not display message again
+        message = get_message(input, channel='channel1')
         bot.display_issues(message)
         assert not message.send_webapi.called
+
+    with controlled_responses(testdata['requests']) as rsps:
+        # Call on another channel should display the message again
+        message = get_message(input, channel='channel2')
+        bot.display_issues(message)
+        assert message.send_webapi.called
 
 
 def test_wrong_auth(bot):

@@ -26,12 +26,15 @@ class CrucibleBot(object):
             .format(crucible_prefixes)
 
     def display_reviews(self, message):
+        def filter_predicate(x):
+            return self.__cache.IsInCache(self.__get_cachekey(x, message))
+
         reviews = self.__crucible_regex.findall(message.body['text'])
-        reviews = filterfalse(self.__cache.IsInCache, reviews)
+        reviews = filterfalse(filter_predicate, reviews)
         if reviews:
             attachments = []
-            for reviewid in filterfalse(self.__cache.IsInCache, reviews):
-                self.__cache.AddToCache(reviewid)
+            for reviewid in filterfalse(filter_predicate, reviews):
+                self.__cache.AddToCache(self.__get_cachekey(reviewid, message))
 
                 try:
                     msg = self.__get_review_message(reviewid)
@@ -117,6 +120,9 @@ class CrucibleBot(object):
 
         reviewers = request.json()['reviewer']
         return ['<@{}>'.format(r['userName']) for r in reviewers]
+
+    def __get_cachekey(self, reviewId, message):
+        return reviewId + message.body['channel']
 
 
 instance = CrucibleBot(MessagesCache(),

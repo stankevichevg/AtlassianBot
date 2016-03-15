@@ -90,8 +90,12 @@ class JiraBot(object):
         attachments = []
 
         issues = self.__jira_regex.findall(message.body['text'])
-        for issue in filterfalse(self.__cache.IsInCache, issues):
-            self.__cache.AddToCache(issue)
+
+        def filter_predicate(x):
+            return self.__cache.IsInCache(self.__get_cachekey(x, message))
+
+        for issue in filterfalse(filter_predicate, issues):
+            self.__cache.AddToCache(self.__get_cachekey(issue, message))
             issue_message = self.get_issue_message(issue)
             if issue_message is None:
                 issue_message = self.__get_issuenotfound_message(issue)
@@ -133,6 +137,9 @@ class JiraBot(object):
         parsed = urlparse(url)
         replaced = parsed._replace(netloc='jira.atlassian.com')
         return urlunparse(replaced)
+
+    def __get_cachekey(self, issue, message):
+        return issue + message.body['channel']
 
 
 class JiraNotifierBot(object):

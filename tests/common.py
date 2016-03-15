@@ -5,8 +5,8 @@ from mock import MagicMock
 from slackbot.dispatcher import Message
 
 
-def get_message(text=None):
-    message = Message(None, {'channel': 'channelid', 'text': text})
+def get_message(text=None, channel='channelid'):
+    message = Message(None, {'channel': channel, 'text': text})
     message.send_webapi = MagicMock()
     return message
 
