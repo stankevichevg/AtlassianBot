@@ -38,6 +38,7 @@ servers:
 
   jira:
     host: https://server
+    # Remove username and password for anonymous login
     username: &default_username username
     password: &default_password password
 

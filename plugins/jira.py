@@ -23,14 +23,16 @@ from utils.messages_cache import MessagesCache
 
 def get_Jira_instance(server):
     try:
+        auth = None
+        if 'username' in server and 'password' in server:
+            auth = (server['username'], server['password'])
+
         return JIRA(
             options={
                 'server': server['host'],
                 'verify': settings.servers.verify_ssl},
-            basic_auth=(
-                        server['username'],
-                        server['password']),
-            validate=True,
+            basic_auth=auth,
+            validate=auth is not None,
             get_server_info=False,
             max_retries=1
         )
