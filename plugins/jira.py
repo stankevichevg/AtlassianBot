@@ -22,24 +22,18 @@ from utils.messages_cache import MessagesCache
 
 
 def get_Jira_instance(server):
-    try:
-        auth = None
-        if 'username' in server and 'password' in server:
-            auth = (server['username'], server['password'])
+    auth = None
+    if 'username' in server and 'password' in server:
+        auth = (server['username'], server['password'])
 
-        return JIRA(
-            options={
-                'server': server['host'],
-                'verify': settings.servers.verify_ssl},
-            basic_auth=auth,
-            validate=auth is not None,
-            get_server_info=False,
-            max_retries=1
-        )
-    except JIRAError as ex:
-        if (ex.status_code == 401):
-            print('JIRA Authentication error')
-            sys.exit(-1)
+    return JIRA(
+        options={
+            'server': server['host'],
+            'verify': settings.servers.verify_ssl},
+        basic_auth=auth,
+        get_server_info=False,
+        max_retries=1
+    )
 
 
 class JiraBot(object):
@@ -122,8 +116,8 @@ class JiraBot(object):
                 'text': summary.decode(),
                 'color': '#59afe1'
             }
-        except JIRAError:
-            return None
+        except JIRAError as ex:
+            return self.__get_error_message(ex)
 
     def __get_issuenotfound_message(self, key):
         return {
@@ -132,6 +126,14 @@ class JiraBot(object):
             'text': ':exclamation: Issue not found',
             'color': 'warning'
         }
+
+    def __get_error_message(self, exception):
+        if (exception.status_code == 401):
+            return {
+                'fallback': 'Jira authentication error',
+                'text': ':exclamation: Jira authentication error',
+                'color': 'danger'
+            }
 
     def __replace_host(self, url):
         parsed = urlparse(url)
@@ -311,8 +313,6 @@ instance = JiraBot(MessagesCache(),
 
 
 if (settings.plugins.jirabot.enabled):
-    print('Jira init')
-
     @listen_to(instance.get_pattern(), re.IGNORECASE)
     @respond_to(instance.get_pattern(), re.IGNORECASE)
     def jirabot(message, _):

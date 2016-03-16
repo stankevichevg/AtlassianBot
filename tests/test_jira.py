@@ -49,12 +49,7 @@ def test_jirapattern(bot, input, expected):
                          ('JIRA-3', data['jirabot_notexist']),
                          ])
 def test_display_issues(bot, input, testdata):
-    with controlled_responses(testdata['requests']) as rsps:
-        rsps.rsps.add(
-            responses.POST,
-            'http://host/rest/auth/1/session',
-            status=200)
-
+    with controlled_responses(testdata['requests']):
         message = get_message(input)
 
         bot.display_issues(message)
@@ -70,12 +65,7 @@ def test_display_issues(bot, input, testdata):
                          ('JIRA-3', data['jirabot_notexist']),
                          ])
 def test_messages_cache(bot, input, testdata):
-    with controlled_responses(testdata['requests']) as rsps:
-        rsps.rsps.add(
-            responses.POST,
-            'http://host/rest/auth/1/session',
-            status=200)
-
+    with controlled_responses(testdata['requests']):
         # First call should display message
         message = get_message(input, channel='channel1')
         bot.display_issues(message)
@@ -86,7 +76,7 @@ def test_messages_cache(bot, input, testdata):
         bot.display_issues(message)
         assert not message.send_webapi.called
 
-    with controlled_responses(testdata['requests']) as rsps:
+    with controlled_responses(testdata['requests']):
         # Call on another channel should display the message again
         message = get_message(input, channel='channel2')
         bot.display_issues(message)
@@ -96,14 +86,20 @@ def test_messages_cache(bot, input, testdata):
 def test_wrong_auth(bot):
     with controlled_responses() as rsps:
         rsps.rsps.add(
-            responses.POST,
-            'http://host/rest/auth/1/session',
+            responses.GET,
+            'http://host/rest/api/2/issue/JIRA-1',
             status=401)
 
         message = get_message('JIRA-1')
+        bot.display_issues(message)
 
-        with pytest.raises(SystemExit):
-            bot.display_issues(message)
+        assert len(message.send_webapi.call_args_list) == 1
+        args, kwargs = message.send_webapi.call_args_list[0]
+        assert args[0] is ''
+        assert json.loads(args[1]) == [{
+                'color': 'danger',
+                'fallback': 'Jira authentication error',
+                'text': ':exclamation: Jira authentication error'}]
 
 
 @pytest.mark.parametrize('testdata', [(data['jiranotifier'])])
@@ -124,11 +120,6 @@ def test_notifier(testdata):
     }
 
     with controlled_responses() as rsps:
-        rsps.rsps.add(
-            responses.POST,
-            'http://host/rest/auth/1/session',
-            status=200)
-
         rsps.rsps.add(
             responses.GET,
             re.compile(r'http?://host/rest/api/2/search.+'),
