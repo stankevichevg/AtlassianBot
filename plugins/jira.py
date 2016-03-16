@@ -8,7 +8,6 @@ from urllib.parse import urlparse, urlunparse
 import threading
 from itertools import filterfalse
 from threading import Thread
-import sys
 
 import arrow
 from jira import JIRA
