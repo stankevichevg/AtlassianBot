@@ -1,0 +1,34 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "py.test",
+			"shell_cmd": "cd \"${project_path}\" && source \"${project_path}/venv/bin/activate\" && py.test -v tests/"
+		},
+		{
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "Anaconda Python Builder",
+			"selector": "source.python",
+			"shell_cmd": "\"venv/bin/python\" -u \"$file\""
+		}
+	],
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		},
+		{
+			"path": "./venv/",
+			"follow_symlinks": true
+		}
+	],
+	"settings":
+	{
+		"anaconda_linting": true,
+		"anaconda_linting_behaviour": "always",
+		"python_interpreter": "venv/bin/python",
+		"use_pylint": false,
+		"validate_imports": true,
+	}
+}
