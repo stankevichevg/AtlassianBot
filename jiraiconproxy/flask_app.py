@@ -37,6 +37,8 @@ def set():
 
     if image.content_type.startswith('image/svg+xml'):
         image = svg2png(image.stream)
+    else:
+        image = image.read()
 
     cache.set(url, image, timeout=CACHE_TIMEOUT)
     return Response(None, status=codes.ok)
