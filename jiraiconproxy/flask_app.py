@@ -1,7 +1,7 @@
-from flask import Flask, abort, request, Response
+from flask import Flask, request, Response, redirect, url_for
 from werkzeug.contrib.cache import SimpleCache
 import wand.image
-
+from requests import codes
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024  # 50KB max for uploaded images
@@ -13,27 +13,38 @@ CACHE_TIMEOUT = 24 * 60 * 60
 cache = SimpleCache()
 
 
+@app.route('/', methods=['GET'])
+def default():
+    return Response(None)
+
+
+@app.route('/has', methods=['GET'])
+def has():
+    url = request.values['url']
+    cached = cache.has(url)
+    return Response(None, status=codes.ok if cached else codes.not_found)
+
+
 @app.route('/get', methods=['GET'])
 def get():
-    url = request.args.get('url', '')
-
+    url = request.values['url']
     cacheitem = cache.get(url)
     if cacheitem is None:
-        abort(404)
+        return redirect(url_for('has', url=url))
 
     return Response(cacheitem, mimetype='image/png')
 
 
-@app.route('/set', methods=['POST'])
+@app.route('/add', methods=['POST'])
 def set():
-    url = request.form.get('url', '')
-    content = request.files['file']
+    url = request.values['url']
+    image = request.files['image']
 
-    if content.content_type.startswith('image/svg+xml'):
-        content = svg2png(content.stream)
+    if image.content_type.startswith('image/svg+xml'):
+        image = svg2png(image.stream)
 
-    cache.set(url, content, timeout=CACHE_TIMEOUT)
-    return Response(content, mimetype='image/png')
+    cache.set(url, image, timeout=CACHE_TIMEOUT)
+    return Response(None, status=codes.ok)
 
 
 def svg2png(stream):
