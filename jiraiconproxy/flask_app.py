@@ -13,16 +13,11 @@ CACHE_TIMEOUT = 24 * 60 * 60
 cache = SimpleCache()
 
 
-@app.route('/', methods=['GET'])
-def default():
-    return Response(None)
-
-
 @app.route('/has', methods=['GET'])
 def has():
     url = request.values['url']
     cached = cache.has(url)
-    return Response(None, status=codes.ok if cached else codes.not_found)
+    return Response(None, status=codes.ok if cached else codes.no_content)
 
 
 @app.route('/get', methods=['GET'])
