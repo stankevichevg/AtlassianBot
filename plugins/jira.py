@@ -18,6 +18,7 @@ from slackbot.bot import Bot, listen_to, respond_to
 
 from . import settings
 from utils.messages_cache import MessagesCache
+from utils.jira_iconproxy import convert_proxyurl
 
 
 def get_Jira_instance(server):
@@ -101,7 +102,9 @@ class JiraBot(object):
     def get_issue_message(self, key):
         try:
             issue = self.__jira.issue(key, fields='summary,issuetype')
-            icon = self.__replace_host(issue.fields.issuetype.iconUrl)
+            icon = convert_proxyurl(
+                                    self.__server['iconproxy'],
+                                    issue.fields.issuetype.iconUrl)
             summary = issue.fields.summary.encode('utf8')
             return {
                 'fallback': '{key} - {summary}\n{url}'.format(
@@ -133,11 +136,6 @@ class JiraBot(object):
                 'text': ':exclamation: Jira authentication error',
                 'color': 'danger'
             }
-
-    def __replace_host(self, url):
-        parsed = urlparse(url)
-        replaced = parsed._replace(netloc='jira.atlassian.com')
-        return urlunparse(replaced)
 
     def __get_cachekey(self, issue, message):
         return issue + message.body['channel']

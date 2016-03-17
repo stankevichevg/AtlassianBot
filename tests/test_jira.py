@@ -12,7 +12,12 @@ from utils.messages_cache import MessagesCache
 with open('tests/test_jira_data.json') as data_file:
     data = json.load(data_file)
 
-server = {'host': 'http://host', 'username': 'user', 'password': 'pass'}
+server = {
+    'host': 'http://host',
+    'username': 'user',
+    'password': 'pass',
+    'iconproxy': 'http://iconproxy'
+    }
 prefixes = ['JIRA', 'JIRB']
 
 
