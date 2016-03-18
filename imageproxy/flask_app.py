@@ -15,7 +15,6 @@ cache = SimpleCache()
 @app.route('/converticon/<content_type>/<content>', methods=['GET'])
 def convert(content_type, content):
     cachekey = request.path
-    content_type = 'image/pmg'
 
     cachevalue = cache.get(cachekey)
 
@@ -29,6 +28,8 @@ def convert(content_type, content):
 
         cache.set(cachekey, content, timeout=CACHE_TIMEOUT)
         cachevalue = content
+    else:
+        content_type = 'image/pmg'
 
     return Response(cachevalue, content_type=content_type)
 
