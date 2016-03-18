@@ -78,7 +78,7 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       },
       {
@@ -153,7 +153,7 @@
     [
       "Yes my lord. I'm looking for tasks...",
       [
-        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"},
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"},
         {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
         {"color": null, "text": "All linked reviews are closed.", "author_name": "CRUCIBLE"},
         {"color": "good", "text": "Git branch repo1 story/JIRA-1-branchname will be removed.", "author_name": "STASH"},
@@ -194,7 +194,7 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       },
       {
@@ -233,7 +233,7 @@
     [
       "Yes my lord. I'm looking for tasks...",
       [
-        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"},
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"},
         {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
         {"color": "danger", "text": "*Review CRUA-1 is not closed.*", "author_name": "CRUCIBLE", "mrkdwn_in": ["text"]},
         {"color": null, "text": "No linked Git branch to remove.", "author_name": "STASH"},
@@ -274,7 +274,7 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       },
       {
@@ -330,7 +330,7 @@
     [
       "Yes my lord. I'm looking for tasks...",
       [
-        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"},
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"},
         {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
         {"color": null, "text": "No linked reviews found.", "author_name": "CRUCIBLE"},
         {"color": "danger", "text": "*Git branch repo1 story/JIRA-1-branchname is not merged.*", "author_name": "STASH", "mrkdwn_in": ["text"]},
@@ -371,7 +371,7 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       },
       {
@@ -407,7 +407,7 @@
     [
       "Yes my lord. I'm looking for tasks...",
       [
-        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"},
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"},
         {"color": null, "text": "JIRA-1 already closed", "author_name": "JIRA"},
         {"color": null, "text": "No linked reviews found.", "author_name": "CRUCIBLE"},
         {"color": null, "text": "No linked Git branch to remove.", "author_name": "STASH"},
@@ -450,7 +450,7 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       },
       {
@@ -536,7 +536,7 @@
     [
       "Yes my lord. I'm looking for tasks...",
       [
-        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"},
+        {"author_link": "http://host/browse/JIRA-1", "color": "#59afe1", "text": "Issue JIRA-1", "author_name": "JIRA-1", "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1", "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"},
         {"color": "good", "text": "JIRA-1 and all subtasks will be closed.", "author_name": "JIRA"},
         {"color": "danger", "text": "*Review CRUB-2 is not closed.*", "author_name": "CRUCIBLE", "mrkdwn_in": ["text"]},
         {"color": "danger", "text": "*Git branch repo1 story/JIRA-1-branchname is not merged.*", "author_name": "STASH", "mrkdwn_in": ["text"]},

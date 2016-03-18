@@ -16,7 +16,7 @@ server = {
     'host': 'http://host',
     'username': 'user',
     'password': 'pass',
-    'iconproxy': 'http://iconproxy'
+    'imageproxy': 'http://imageproxy'
     }
 prefixes = ['JIRA', 'JIRB']
 

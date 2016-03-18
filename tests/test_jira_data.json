@@ -30,11 +30,11 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fbug.png",
+        "url": "http://host/images/icons/issuetypes/bug.png",
         "code": 200
       }
     ],
@@ -46,7 +46,7 @@
         "text": "Issue JIRA-1",
         "author_name": "JIRA-1",
         "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1",
-        "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"
+        "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"
       },
       {
         "author_link": "http://host/browse/JIRA-2",
@@ -54,7 +54,7 @@
         "text": "Issue JIRA-2",
         "author_name": "JIRA-2",
         "fallback": "JIRA-2 - Issue JIRA-2\nhttp://host/browse/JIRA-2",
-        "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fbug.png"
+        "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"
       }
     ]
   },
@@ -77,7 +77,7 @@
         }
       },
       {
-        "url": "http://iconproxy/has?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png",
+        "url": "http://host/images/icons/issuetypes/story.png",
         "code": 200
       }
     ],
@@ -89,7 +89,7 @@
         "text": "Issue JIRA-1",
         "author_name": "JIRA-1",
         "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1",
-        "author_icon": "http://iconproxy/get?url=http%3A%2F%2Fhost%2Fimages%2Ficons%2Fissuetypes%2Fstory.png"
+        "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/"
       }
     ]
   },
