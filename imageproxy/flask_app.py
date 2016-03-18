@@ -4,7 +4,6 @@ import wand.image
 from base64 import b64decode
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024  # 50KB max for uploaded images
 app.debug = False
 
 
@@ -16,13 +15,14 @@ cache = SimpleCache()
 @app.route('/converticon/<content_type>/<content>', methods=['GET'])
 def convert(content_type, content):
     cachekey = request.path
-    print(cachekey)
-    content_type = b64decode(content_type.encode(), altchars='-_').decode()
-    content = b64decode(content.encode(), altchars='-_')
+    content_type = 'image/pmg'
 
     cachevalue = cache.get(cachekey)
+
     if cachevalue is None:
-        print('Add in cache')
+        content = b64decode(content.encode(), altchars='-_')
+        content_type = b64decode(content_type.encode(), altchars='-_').decode()
+
         if content_type.startswith('image/svg+xml'):
             content = svg2png(content)
             content_type = 'image/png'
@@ -30,7 +30,13 @@ def convert(content_type, content):
         cache.set(cachekey, content, timeout=CACHE_TIMEOUT)
         cachevalue = content
 
-    return Response(content, mimetype=content_type)
+    return Response(cachevalue, content_type=content_type)
+
+
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = CACHE_TIMEOUT
+    return response
 
 
 def svg2png(data):
