@@ -1,7 +1,7 @@
-from flask import Flask, request, Response, redirect, url_for
+from flask import Flask, request, Response
 from werkzeug.contrib.cache import SimpleCache
 import wand.image
-from requests import codes
+from base64 import b64decode
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024  # 50KB max for uploaded images
@@ -13,39 +13,28 @@ CACHE_TIMEOUT = 24 * 60 * 60
 cache = SimpleCache()
 
 
-@app.route('/has', methods=['GET'])
-def has():
-    url = request.values['url']
-    cached = cache.has(url)
-    return Response(None, status=codes.ok if cached else codes.no_content)
+@app.route('/converticon/<content_type>/<content>', methods=['GET'])
+def convert(content_type, content):
+    cachekey = request.path
+    print(cachekey)
+    content_type = b64decode(content_type.encode(), altchars='-_').decode()
+    content = b64decode(content.encode(), altchars='-_')
+
+    cachevalue = cache.get(cachekey)
+    if cachevalue is None:
+        print('Add in cache')
+        if content_type.startswith('image/svg+xml'):
+            content = svg2png(content)
+            content_type = 'image/png'
+
+        cache.set(cachekey, content, timeout=CACHE_TIMEOUT)
+        cachevalue = content
+
+    return Response(content, mimetype=content_type)
 
 
-@app.route('/get', methods=['GET'])
-def get():
-    url = request.values['url']
-    cacheitem = cache.get(url)
-    if cacheitem is None:
-        return redirect(url_for('has', url=url))
-
-    return Response(cacheitem, mimetype='image/png')
-
-
-@app.route('/add', methods=['POST'])
-def set():
-    url = request.values['url']
-    image = request.files['image']
-
-    if image.content_type.startswith('image/svg+xml'):
-        image = svg2png(image.stream)
-    else:
-        image = image.read()
-
-    cache.set(url, image, timeout=CACHE_TIMEOUT)
-    return Response(None, status=codes.ok)
-
-
-def svg2png(stream):
-    with wand.image.Image(blob=stream.read(), format="svg") as image:
+def svg2png(data):
+    with wand.image.Image(blob=data, format="svg") as image:
         return image.make_blob("png")
 
 
