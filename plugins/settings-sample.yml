@@ -42,11 +42,11 @@ servers:
     username: &default_username username
     password: &default_password password
 
-    # Icon proxy server is used to display issue type icons on Slack
+    # Image proxy server is used to display issue type icons on Slack
     # This server has two purpose:
     # - Slack requires a public image URL and your Jira server can be private
     # - Some icon use SVG format and Slack doesn't support it
-    iconproxy: http://atlassianbot.pythonanywhere.com
+    imageproxy: https://atlassianbot.pythonanywhere.com
 
   bamboo:
     host: https://server

@@ -18,7 +18,7 @@ from slackbot.bot import Bot, listen_to, respond_to
 
 from . import settings
 from utils.messages_cache import MessagesCache
-from utils.jira_iconproxy import convert_proxyurl
+from utils.imageproxy import convert_proxyurl
 
 
 def get_Jira_instance(server):
@@ -103,7 +103,7 @@ class JiraBot(object):
         try:
             issue = self.__jira.issue(key, fields='summary,issuetype')
             icon = convert_proxyurl(
-                                    self.__server['iconproxy'],
+                                    self.__server['imageproxy'],
                                     issue.fields.issuetype.iconUrl)
             summary = issue.fields.summary.encode('utf8')
             return {
