@@ -5,6 +5,7 @@ import json
 import os
 import fnmatch
 from datetime import datetime, timedelta
+from shutil import rmtree
 
 from slackbot.bot import respond_to
 
@@ -220,8 +221,7 @@ class CleanBot(object):
         return result
 
     def __remove_folder(self, folder):
-        # shutil.rmtree(folder)
-        pass
+        rmtree(folder)
 
     def _get_username(self, message):
         userid = message._get_user_id()
