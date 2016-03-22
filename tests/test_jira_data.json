@@ -139,7 +139,7 @@
         "color": "#14892c",
         "text": "Summary",
         "fallback": "JIRA-23510 - Summary\nhttp://host/browse/JIRA-23510",
-        "author_icon": "http://jira.atlassian.com/images/icons/issuetypes/bug.png",
+        "author_icon": "http://imageproxy/converticon/YXBwbGljYXRpb24vanNvbg==/",
         "author_name": "JIRA-23510"
       }
     ]

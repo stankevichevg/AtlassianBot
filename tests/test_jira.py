@@ -139,6 +139,13 @@ def test_notifier(testdata):
             body=json.dumps(testdata['requests'][0]['text']),
             content_type='application/json')
 
+        rsps.rsps.add(
+            responses.GET,
+            'http://host/images/icons/issuetypes/bug.png',
+            status=200,
+            body=None,
+            content_type='application/json')
+
         obj = JiraNotifierBot(server, conf, slack_mock)
 
         # Wait the thread retrieve initial issue

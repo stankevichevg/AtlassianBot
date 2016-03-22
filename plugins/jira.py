@@ -217,7 +217,9 @@ class JiraNotifierBot(object):
                 attachments = []
                 for issue in results[::-1]:
                     summary = issue.fields.summary.encode('utf8')
-                    icon = self.__replace_host(issue.fields.issuetype.iconUrl)
+                    icon = convert_proxyurl(
+                                    self.__server['imageproxy'],
+                                    issue.fields.issuetype.iconUrl)
 
                     sps = self.__get_storypoints(issue)
                     sps = self.__formatvalue(sps)
@@ -294,11 +296,6 @@ class JiraNotifierBot(object):
         for id, channel in list(self.slackclient.channels.items()):
             if channel.get('name', None) == channelname:
                 return id
-
-    def __replace_host(self, url):
-        parsed = urlparse(url)
-        replaced = parsed._replace(netloc='jira.atlassian.com')
-        return urlunparse(replaced)
 
 
 if (settings.plugins.jiranotifier.enabled):
