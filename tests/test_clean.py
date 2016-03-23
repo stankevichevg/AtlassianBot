@@ -1,8 +1,7 @@
 import pytest
 import json
 import re
-import responses
-from mock import MagicMock, mock
+from mock import MagicMock
 
 from plugins.clean import CleanBot
 from plugins.stash import Stash

@@ -124,7 +124,7 @@ def test_notifier(testdata):
         ]
     }
 
-    with controlled_responses() as rsps:
+    with controlled_responses(testdata['requests'][1:]) as rsps:
         rsps.rsps.add(
             responses.GET,
             re.compile(r'http?://host/rest/api/2/search.+'),
@@ -137,13 +137,6 @@ def test_notifier(testdata):
             re.compile(r'http?://host/rest/api/2/search.+'),
             status=200,
             body=json.dumps(testdata['requests'][0]['text']),
-            content_type='application/json')
-
-        rsps.rsps.add(
-            responses.GET,
-            'http://host/images/icons/issuetypes/bug.png',
-            status=200,
-            body=None,
             content_type='application/json')
 
         obj = JiraNotifierBot(server, conf, slack_mock)
