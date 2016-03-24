@@ -28,6 +28,9 @@ install:
   # Install CodeCov requirements
   - "pip install codecov"
 
+  # Install ImageMagick
+  - choco install imagemagick.app -y
+
 build: off
 
 test_script:
