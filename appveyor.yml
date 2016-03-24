@@ -29,7 +29,7 @@ build: off
 
 test_script:
   - "COPY plugins\\settings-sample.yml plugins\\settings.yml"
-  - "coverage run --source=plugins,utils -m py.test -vv tests/"
+  - "coverage run --source=plugins,utils,imageproxy -m py.test -vv tests/"
 
 after_test:
   - "coverage report"

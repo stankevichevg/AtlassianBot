@@ -10,3 +10,4 @@ pyyaml>=3.11
 -e git+https://github.com/alfred82santa/configure.git@173ea9b4257a988dd0df604505a09b6778d9df54#egg=configure-master
 coverage>=3.7.1
 pytest>=2.9.0
+pytest-flask>=0.10.0

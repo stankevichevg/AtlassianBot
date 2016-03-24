@@ -50,7 +50,7 @@
         "text": "Issue JIRA-1",
         "author_name": "JIRA-1",
         "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1",
-        "author_icon": "http://imageproxy/converticon/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACwAAAAAAQABAAACAkQBADs="
+        "author_icon": "http://imageproxy/image/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACwAAAAAAQABAAACAkQBADs="
       },
       {
         "author_link": "http://host/browse/JIRA-2",
@@ -58,7 +58,7 @@
         "text": "Issue JIRA-2",
         "author_name": "JIRA-2",
         "fallback": "JIRA-2 - Issue JIRA-2\nhttp://host/browse/JIRA-2",
-        "author_icon": "http://imageproxy/converticon/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+        "author_icon": "http://imageproxy/image/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
       }
     ]
   },
@@ -95,7 +95,7 @@
         "text": "Issue JIRA-1",
         "author_name": "JIRA-1",
         "fallback": "JIRA-1 - Issue JIRA-1\nhttp://host/browse/JIRA-1",
-        "author_icon": "http://imageproxy/converticon/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACwAAAAAAQABAAACAkQBADs="
+        "author_icon": "http://imageproxy/image/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACwAAAAAAQABAAACAkQBADs="
       }
     ]
   },
@@ -151,7 +151,7 @@
         "color": "#14892c",
         "text": "Summary",
         "fallback": "JIRA-23510 - Summary\nhttp://host/browse/JIRA-23510",
-        "author_icon": "http://imageproxy/converticon/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==",
+        "author_icon": "http://imageproxy/image/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==",
         "author_name": "JIRA-23510"
       }
     ]
