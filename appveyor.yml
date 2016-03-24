@@ -4,8 +4,10 @@ environment:
 
     - PYTHON: "C:\\Python34"
       PYTHON_VERSION: "Python 3.4 x86"
+      IMAGEMAGICK_PLATFORM: "--x86"
     - PYTHON: "C:\\Python35"
       PYTHON_VERSION: "Python 3.5 x86"
+      IMAGEMAGICK_PLATFORM: "--x86"
     - PYTHON: "C:\\Python34-x64"
       PYTHON_VERSION: "Python 3.4 x64"
       DISTUTILS_USE_SDK: "1"
@@ -29,7 +31,7 @@ install:
   - "pip install codecov"
 
   # Install ImageMagick
-  - choco install imagemagick.app -y
+  - choco install imagemagick.app -y %IMAGEMAGICK_PLATFORM%
 
 build: off
 
