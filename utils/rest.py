@@ -1,5 +1,4 @@
 import json
-import logging
 import requests
 import plugins.settings as settings
 
@@ -7,15 +6,16 @@ headers = {'accept': 'application/json'}
 
 
 def get(config, path, data=None):
+    auth = None
+    if 'username' in config and 'password' in config:
+        auth = (config['username'], config['password'])
+
     request = requests.get(
         url=__format_url(config, path),
         params=data,
         headers=headers,
-        auth=(config['username'], config['password']),
+        auth=auth,
         verify=settings.servers.verify_ssl)
-
-    logging.debug('GET %s - Response %s - Data %s'
-                  % (request.url, request.status_code, data))
 
     return request
 
@@ -31,9 +31,6 @@ def delete(config, path, data):
         auth=(config['username'], config['password']),
         verify=settings.servers.verify_ssl)
 
-    logging.debug('DELETE %s - Response %s - Data %s'
-                  % (request.url, request.status_code, data))
-
     return request
 
 
@@ -44,9 +41,6 @@ def post(config, path, data=None):
         headers=headers,
         auth=(config['username'], config['password']),
         verify=settings.servers.verify_ssl)
-
-    logging.debug('POST %s - Response %s - Data %s'
-                  % (request.url, request.status_code, data))
 
     return request
 
