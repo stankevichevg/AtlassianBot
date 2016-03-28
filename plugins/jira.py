@@ -67,20 +67,22 @@ class JiraBot(object):
 
     def close(self, key, user):
         issue = self.__jira.issue(key, fields='subtasks,status')
-        comment = 'Closed by AtlassianBot (Origin: {})'.format(user)
+        comment = 'Closed by AtlassianBot (Original user: {})'.format(user)
         for subtask in issue.fields.subtasks:
             if str(subtask.fields.status) != 'Closed':
                 self.__jira.transition_issue(
                     subtask,
                     'Closed',
-                    comment=comment
+                    comment=comment,
+                    assignee={'name': user}
                 )
 
         if str(issue.fields.status) != 'Closed':
             self.__jira.transition_issue(
                 issue,
                 'Closed',
-                comment=comment
+                comment=comment,
+                assignee={'name': user}
             )
 
     def display_issues(self, message):
@@ -287,10 +289,8 @@ class JiraNotifierBot(object):
             return issue.fields.customfield_10012
 
     def __get_author(self, issue):
-        if len(issue.changelog.histories) > 0:
-            event = issue.changelog.histories[-1]
-            author = event.author.name
-            return '<@{}>'.format(author)
+        author = issue.assignee.name
+        return '<@{}>'.format(author)
 
     def __get_status(self, issue):
         if len(issue.changelog.histories) > 0:
