@@ -1,13 +1,12 @@
 # coding: utf-8
 
+from concurrent.futures import ThreadPoolExecutor
 import inspect
 import re
-import time
 import json
-from urllib.parse import urlparse, urlunparse
-import threading
+import logging
 from itertools import filterfalse
-from threading import Thread
+from threading import Event
 
 import arrow
 from jira import JIRA
@@ -19,6 +18,10 @@ from slackbot.bot import Bot, listen_to, respond_to
 from . import settings
 from utils.messages_cache import MessagesCache
 from utils.imageproxy import convert_proxyurl
+
+logger = logging.getLogger(__name__)
+
+MAX_NOTIFIERS_WORKERS = 2
 
 
 def get_Jira_instance(server):
@@ -144,62 +147,67 @@ class JiraBot(object):
 class JiraNotifierBot(object):
     def __init__(self, server, config, slackclient=None):
         self.__server = server
-        self.thread_started = threading.Event()
 
         if slackclient is None:
             slackclient = self.__get_slackclient()
         self.slackclient = slackclient
 
         if self.slackclient is None:
-            print('Unable to retrieve slackclient instance')
+            logger.error('Unable to retrieve slackclient instance')
             return
 
-        for notifier in config['notifiers']:
-            self.__init_notifier_thread(
-                slackclient,
-                notifier,
+        # Contains last issue for each notifier
+        self.__notifiers = {}
+
+        self._notifier_run_callback = None
+        self._executor = ThreadPoolExecutor(max_workers=MAX_NOTIFIERS_WORKERS)
+        for notifier_settings in config['notifiers']:
+            self._executor.submit(
+                self.__notifier_init,
+                notifier_settings,
                 config['polling_interval'])
 
     @lazy
     def __jira(self):
         return get_Jira_instance(self.__server)
 
-    def __init_notifier_thread(self, slackclient, notifier, polling_interval):
-        thread = Thread(
-                        target=self.__notifier_run,
-                        args=(slackclient, notifier, polling_interval)
-                        )
-        thread.setDaemon(True)
-        thread.start()
+    def __notifier_init(self, notifier_settings, polling_interval):
 
-    def __notifier_run(self, slackclient, notifier_settings, polling_interval):
         try:
-            self.__notifier(slackclient, notifier_settings, polling_interval)
-        except SystemExit:
-            self.thread_started.set()
+            channel_id = self.__get_channel(notifier_settings['channel'])
+            if channel_id is None:
+                logger.error('Unable to find channel')
+                return
 
-    def __notifier(self, slackclient, notifier_settings, polling_interval):
-        channel_id = self.__get_channel(notifier_settings['channel'])
-        if channel_id is None:
-            print('Unable to find channel')
-            return
+            # First query to retrieve last matching task
+            query = '{} AND status = Closed ORDER BY updated DESC'\
+                .format(notifier_settings['query'])
 
-        # First query to retrieve last matching task
-        query = '{} AND status = Closed ORDER BY updated DESC'\
-            .format(notifier_settings['query'])
+            results = self.__jira.search_issues(query, maxResults=1)
 
-        results = self.__jira.search_issues(query, maxResults=1)
+            if len(results) == 0:
+                logger.error('No initial issue found')
+                return
 
-        if len(results) == 0:
-            print('No initial issue found')
-            return
+            self.__notifiers[frozenset(notifier_settings.items())] = results[0]
 
-        while True:
-            time.sleep(polling_interval)
+            self._executor.submit(
+                self.__notifier_run,
+                notifier_settings,
+                polling_interval,
+                channel_id)
+        except JIRAError as ex:
+            logger.error(ex)
+
+    def __notifier_run(self, notifier_settings, polling_interval, channel_id):
+        Event().wait(polling_interval)
+
+        try:
+            result = self.__notifiers[frozenset(notifier_settings.items())]
 
             # Convert last issue update date
             # to a compatible timestamp for Jira
-            date = arrow.get(results[0].fields.updated)
+            date = arrow.get(result.fields.updated)
 
             last_update = (date.timestamp + 1) * 1000
             query = '{} AND status CHANGED TO Closed DURING({}, NOW()) '\
@@ -207,13 +215,13 @@ class JiraNotifierBot(object):
                 .format(notifier_settings['query'], last_update)
 
             fields = 'summary,customfield_10012,updated,issuetype'
-            new_results = self.__jira.search_issues(
+            results = self.__jira.search_issues(
                             query,
                             fields=fields,
                             expand='changelog')
 
-            if len(new_results) > 0:
-                results = new_results
+            if len(results) > 0:
+                self.__notifiers[frozenset(notifier_settings.items())] = results[0]
                 attachments = []
                 for issue in results[::-1]:
                     summary = issue.fields.summary.encode('utf8')
@@ -261,7 +269,16 @@ class JiraNotifierBot(object):
                     '',
                     attachments=json.dumps(attachments))
 
-            self.thread_started.set()
+                if self._notifier_run_callback is not None:
+                    self._notifier_run_callback()
+        except JIRAError as ex:
+            logger.error(ex)
+        finally:
+            self._executor.submit(
+                self.__notifier_run,
+                notifier_settings,
+                polling_interval,
+                channel_id)
 
     def __get_storypoints(self, issue):
         if hasattr(issue.fields, 'customfield_10012') and \

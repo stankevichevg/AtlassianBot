@@ -13,7 +13,7 @@ requests.packages.urllib3.disable_warnings()
 
 def main():
     kw = {
-        'format': '[%(asctime)s] %(message)s',
+        'format': '[%(asctime)s] - %(name)s - %(message)s',
         'datefmt': '%m/%d/%Y %H:%M:%S',
         'level': logging.DEBUG if settings.DEBUG else logging.INFO,
         'stream': sys.stdout,

@@ -3,6 +3,7 @@ from mock import MagicMock, mock
 import responses
 import re
 import json
+from threading import Event
 
 from .common import controlled_responses, get_message
 from plugins.jira import JiraBot, JiraNotifierBot
@@ -140,9 +141,14 @@ def test_notifier(testdata):
             content_type='application/json')
 
         obj = JiraNotifierBot(server, conf, slack_mock)
+        event = Event()
 
-        # Wait the thread retrieve initial issue
-        obj.thread_started.wait()
+        def notifier_run():
+            obj._executor.shutdown(wait=False)
+            event.set()
+
+        obj._notifier_run_callback = notifier_run
+        assert event.wait(timeout=5) is True
 
         slack_mock.send_message.assert_called_once_with(
                                                         'channel_id',
