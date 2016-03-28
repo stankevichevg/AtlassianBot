@@ -196,7 +196,7 @@ class JiraNotifierBot(object):
                 notifier_settings,
                 polling_interval,
                 channel_id)
-        except JIRAError as ex:
+        except Exception as ex:
             logger.error(ex)
 
     def __notifier_run(self, notifier_settings, polling_interval, channel_id):
@@ -271,7 +271,8 @@ class JiraNotifierBot(object):
 
                 if self._notifier_run_callback is not None:
                     self._notifier_run_callback()
-        except JIRAError as ex:
+
+        except Exception as ex:
             logger.error(ex)
         finally:
             self._executor.submit(
