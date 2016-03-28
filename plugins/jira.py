@@ -271,8 +271,8 @@ class JiraNotifierBot(object):
                     '',
                     attachments=json.dumps(attachments))
 
-                if self._notifier_run_callback is not None:
-                    self._notifier_run_callback()
+            if self._notifier_run_callback is not None:
+                self._notifier_run_callback()
 
         except Exception as ex:
             logger.error(ex)
