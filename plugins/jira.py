@@ -291,7 +291,6 @@ class JiraNotifierBot(object):
     def __get_author(self, issue):
         if len(issue.changelog.histories) > 0:
             event = issue.changelog.histories[-1]
-            logger.warn(event.items[0])
             # Search in history in we have a transition to Closed
             # with a change of the assignee
             # => it's probably a transition done by the bot
@@ -299,7 +298,7 @@ class JiraNotifierBot(object):
             if res is not None:
                 author = res.to
             else:
-                author = event.author.name
+                author = issue.fields.assignee.name
 
             return '<@{}>'.format(author)
 

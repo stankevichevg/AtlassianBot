@@ -209,7 +209,8 @@
               {
                 "summary":"Summary",
                 "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/bug.gif" },
-                "updated":"2015-07-21T11:44:45.000+0200"
+                "updated":"2015-07-21T11:44:45.000+0200",
+                "assignee": { "name": "assigneeUser" }
               },
               "changelog":
               {
@@ -217,7 +218,6 @@
                 "histories":
                 [
                   {
-                    "author": { "name": "userInHistory" },
                     "items":
                     [
                       {
@@ -244,7 +244,7 @@
     [
       {
         "fields": [
-          {"short": true, "value": "<@userInHistory>", "title": "Closed by"},
+          {"short": true, "value": "<@assigneeUser>", "title": "Closed by"},
           {"short": true, "value": "N/A", "title": "Story points"}
         ],
         "mrkdwn_in": ["fields"],
