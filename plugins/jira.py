@@ -148,6 +148,8 @@ class JiraBot(object):
 
 class JiraNotifierBot(object):
     def __init__(self, server, config, slackclient=None):
+        logger.info('registered JiraNotifierBot')
+
         self.__server = server
 
         if slackclient is None:
@@ -164,6 +166,10 @@ class JiraNotifierBot(object):
         self._notifier_run_callback = None
         self._executor = ThreadPoolExecutor(max_workers=MAX_NOTIFIERS_WORKERS)
         for notifier_settings in config['notifiers']:
+            logger.info('registered JiraNotifierBot for query \'%s\' '
+                        'on channel \'#%s\'',
+                        notifier_settings['query'],
+                        notifier_settings['channel'])
             self._executor.submit(
                 self.__notifier_init,
                 notifier_settings,
@@ -174,7 +180,6 @@ class JiraNotifierBot(object):
         return get_Jira_instance(self.__server)
 
     def __notifier_init(self, notifier_settings, polling_interval):
-
         try:
             channel_id = self.__get_channel(notifier_settings['channel'])
             if channel_id is None:
@@ -199,7 +204,7 @@ class JiraNotifierBot(object):
                 polling_interval,
                 channel_id)
         except Exception as ex:
-            logger.error(ex)
+            logger.error('Unable to init notifier: %s', ex, exc_info=True)
 
     def __notifier_run(self, notifier_settings, polling_interval, channel_id):
         Event().wait(polling_interval)
@@ -275,7 +280,7 @@ class JiraNotifierBot(object):
                 self._notifier_run_callback()
 
         except Exception as ex:
-            logger.error(ex)
+            logger.error('Unable to run notifier: %s', ex, exc_info=True)
         finally:
             self._executor.submit(
                 self.__notifier_run,
