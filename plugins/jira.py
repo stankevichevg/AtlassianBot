@@ -289,8 +289,19 @@ class JiraNotifierBot(object):
             return issue.fields.customfield_10012
 
     def __get_author(self, issue):
-        author = issue.assignee.name
-        return '<@{}>'.format(author)
+        if len(issue.changelog.histories) > 0:
+            event = issue.changelog.histories[-1]
+            logger.warn(event.items[0])
+            # Search in history in we have a transition to Closed
+            # with a change of the assignee
+            # => it's probably a transition done by the bot
+            res = next((x for x in event.items if x.field == 'assignee'), None)
+            if res is not None:
+                author = res.to
+            else:
+                author = event.author.name
+
+            return '<@{}>'.format(author)
 
     def __get_status(self, issue):
         if len(issue.changelog.histories) > 0:
