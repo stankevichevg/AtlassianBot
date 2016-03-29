@@ -120,7 +120,7 @@
     ]
   },
 
-  "jiranotifier":
+  "jiranotifier_changelog_with_assignee":
   {
     "requests":
     [
@@ -129,7 +129,41 @@
         "code": 200,
         "text":
         {
-          "expand":"names,schema","startAt":0,"maxResults":1,"total":2483,"issues":[{"expand":"operations,editmeta,changelog,transitions,renderedFields","id":"123427","self":"http://host/rest/api/2/issue/123427","key":"JIRA-23510","fields":{"summary":"Summary","issuetype":{"self":"http://host/rest/api/2/issuetype/1","id":"1","description":"A problem which impairs or prevents the functions of the product.","iconUrl":"http://host/images/icons/issuetypes/bug.gif","name":"Bug / Defect","subtask":false},"customfield_10012":0.0,"updated":"2015-07-21T11:44:45.000+0200"},"assignee":{"name":"assigneeuser"},"changelog":{"startAt":0,"maxResults":9,"total":9,"histories":[{"id":"1198402","author":{"self":"http://host/rest/api/2/user?username=user1","name":"user1","emailAddress":"user1@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?ownerId=user1&avatarId=14690","24x24":"http://host/secure/useravatar?size=small&ownerId=user1&avatarId=14690","16x16":"http://host/secure/useravatar?size=xsmall&ownerId=user1&avatarId=14690","32x32":"http://host/secure/useravatar?size=medium&ownerId=user1&avatarId=14690"},"displayName":"User 1","active":true},"created":"2015-07-08T16:15:11.000+0200","items":[{"field":"Epic Link","fieldtype":"custom","from":null,"fromString":null,"to":"43217","toString":"JIRA-11379"}]},{"id":"1206387","author":{"self":"http://host/rest/api/2/user?username=user3","name":"user3","emailAddress":"user3@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?avatarId=10108","24x24":"http://host/secure/useravatar?size=small&avatarId=10108","16x16":"http://host/secure/useravatar?size=xsmall&avatarId=10108","32x32":"http://host/secure/useravatar?size=medium&avatarId=10108"},"displayName":"user 3","active":true},"created":"2015-07-16T15:14:08.000+0200","items":[{"field":"assignee","fieldtype":"jira","from":null,"fromString":null,"to":"user3","toString":"user 3"}]},{"id":"1206388","author":{"self":"http://host/rest/api/2/user?username=user3","name":"user3","emailAddress":"user3@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?avatarId=10108","24x24":"http://host/secure/useravatar?size=small&avatarId=10108","16x16":"http://host/secure/useravatar?size=xsmall&avatarId=10108","32x32":"http://host/secure/useravatar?size=medium&avatarId=10108"},"displayName":"user 3","active":true},"created":"2015-07-16T15:14:10.000+0200","items":[{"field":"status","fieldtype":"jira","from":"10028","fromString":"To Define","to":"3","toString":"In Progress"}]},{"id":"1207911","author":{"self":"http://host/rest/api/2/user?username=user2","name":"user2","emailAddress":"user2@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?ownerId=user2&avatarId=11093","24x24":"http://host/secure/useravatar?size=small&ownerId=user2&avatarId=11093","16x16":"http://host/secure/useravatar?size=xsmall&ownerId=user2&avatarId=11093","32x32":"http://host/secure/useravatar?size=medium&ownerId=user2&avatarId=11093"},"displayName":"user 2","active":true},"created":"2015-07-17T16:50:55.000+0200","items":[{"field":"Sprint","fieldtype":"custom","from":"664","fromString":"2015-8 (24/06 - 16/07) - Win","to":"154, 664","toString":"Various bugs, 2015-8 (24/06 - 16/07) - Win"}]},{"id":"1207932","author":{"self":"http://host/rest/api/2/user?username=user2","name":"user2","emailAddress":"user2@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?ownerId=user2&avatarId=11093","24x24":"http://host/secure/useravatar?size=small&ownerId=user2&avatarId=11093","16x16":"http://host/secure/useravatar?size=xsmall&ownerId=user2&avatarId=11093","32x32":"http://host/secure/useravatar?size=medium&ownerId=user2&avatarId=11093"},"displayName":"user 2","active":true},"created":"2015-07-17T16:52:00.000+0200","items":[{"field":"Sprint","fieldtype":"custom","from":"154, 664","fromString":"Various bugs, 2015-8 (24/06 - 16/07) - Win","to":"664, 672","toString":"2015-8 (24/06 - 16/07) - Win, 2015-9 (20/07 - 08/08) - Win"}]},{"id":"1207954","author":{"self":"http://host/rest/api/2/user?username=user2","name":"user2","emailAddress":"user2@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?ownerId=user2&avatarId=11093","24x24":"http://host/secure/useravatar?size=small&ownerId=user2&avatarId=11093","16x16":"http://host/secure/useravatar?size=xsmall&ownerId=user2&avatarId=11093","32x32":"http://host/secure/useravatar?size=medium&ownerId=user2&avatarId=11093"},"displayName":"user 2","active":true},"created":"2015-07-17T16:52:25.000+0200","items":[{"field":"Rank","fieldtype":"custom","from":"","fromString":"","to":"","toString":"Ranked higher"}]},{"id":"1208026","author":{"self":"http://host/rest/api/2/user?username=user2","name":"user2","emailAddress":"user2@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?ownerId=user2&avatarId=11093","24x24":"http://host/secure/useravatar?size=small&ownerId=user2&avatarId=11093","16x16":"http://host/secure/useravatar?size=xsmall&ownerId=user2&avatarId=11093","32x32":"http://host/secure/useravatar?size=medium&ownerId=user2&avatarId=11093"},"displayName":"user 2","active":true},"created":"2015-07-17T16:54:52.000+0200","items":[{"field":"Rank","fieldtype":"custom","from":"","fromString":"","to":"","toString":"Ranked higher"}]},{"id":"1210011","author":{"self":"http://host/rest/api/2/user?username=user3","name":"user3","emailAddress":"user3@doman.com","avatarUrls":{"48x48":"http://host/secure/useravatar?avatarId=10108","24x24":"http://host/secure/useravatar?size=small&avatarId=10108","16x16":"http://host/secure/useravatar?size=xsmall&avatarId=10108","32x32":"http://host/secure/useravatar?size=medium&avatarId=10108"},"displayName":"user 3","active":true},"created":"2015-07-21T11:03:43.000+0200","items":[{"field":"timeoriginalestimate","fieldtype":"jira","from":null,"fromString":null,"to":"0","toString":"0"},{"field":"timeestimate","fieldtype":"jira","from":null,"fromString":null,"to":"0","toString":"0"},{"field":"status","fieldtype":"jira","from":"3","fromString":"In Progress","to":"5","toString":"Resolved"},{"field":"resolution","fieldtype":"jira","from":null,"fromString":null,"to":"2","toString":"Won't Fix"}]},{"id":"1210160","author":{"self":"http://host/rest/api/2/user?username=user1","name":"user1","emailAddress":"user1@domain.com","avatarUrls":{"48x48":"http://host/secure/useravatar?ownerId=user1&avatarId=14690","24x24":"http://host/secure/useravatar?size=small&ownerId=user1&avatarId=14690","16x16":"http://host/secure/useravatar?size=xsmall&ownerId=user1&avatarId=14690","32x32":"http://host/secure/useravatar?size=medium&ownerId=user1&avatarId=14690"},"displayName":"User 1","active":true},"created":"2015-07-21T11:44:45.000+0200","items":[{"field":"status","fieldtype":"jira","from":"5","fromString":"Resolved","to":"6","toString":"Closed"},{"field":"assignee","fieldtype":"jira","from":"userBeforeClose","to":"userAfterClose"}]}]}}]
+          "total":1,
+          "issues":
+          [
+            {
+              "key":"JIRA-23510",
+              "fields":
+              {
+                "summary":"Summary",
+                "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/bug.gif" },
+                "updated":"2015-07-21T11:44:45.000+0200"
+              },
+              "changelog":
+              {
+                "total":1,
+                "histories":
+                [
+                  {
+                    "author": { "name": "userInHistory" },
+                    "items":
+                    [
+                      {
+                        "field":"status",
+                        "fromString":"Resolved",
+                        "toString":"Closed"
+                      },
+                      {
+                        "field":"assignee",
+                        "to":"userAfterClose"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
         }
       },
       {
@@ -144,6 +178,73 @@
       {
         "fields": [
           {"short": true, "value": "<@userAfterClose>", "title": "Closed by"},
+          {"short": true, "value": "N/A", "title": "Story points"}
+        ],
+        "mrkdwn_in": ["fields"],
+        "author_link": "http://host/browse/JIRA-23510",
+        "color": "#14892c",
+        "text": "Summary",
+        "fallback": "JIRA-23510 - Summary\nhttp://host/browse/JIRA-23510",
+        "author_icon": "http://imageproxy/image/aW1hZ2UvZ2lm/R0lGODlhAQABAIAAAP___wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==",
+        "author_name": "JIRA-23510"
+      }
+    ]
+  },
+
+  "jiranotifier_changelog_without_assignee":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/2/search?jql=project+%3D+JIRA+and+status+%3D+Closed+and+issuetype+not+in+subtaskIssueTypes%28%29+AND+status+%3D+Closed+ORDER+BY+updated+DESC&validateQuery=True&startAt=0&maxResults=1",
+        "code": 200,
+        "text":
+        {
+          "total":1,
+          "issues":
+          [
+            {
+              "key":"JIRA-23510",
+              "fields":
+              {
+                "summary":"Summary",
+                "issuetype": { "iconUrl":"http://host/images/icons/issuetypes/bug.gif" },
+                "updated":"2015-07-21T11:44:45.000+0200"
+              },
+              "changelog":
+              {
+                "total":1,
+                "histories":
+                [
+                  {
+                    "author": { "name": "userInHistory" },
+                    "items":
+                    [
+                      {
+                        "field":"status",
+                        "fromString":"Resolved",
+                        "toString":"Closed"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://host/images/icons/issuetypes/bug.gif",
+        "code": 200,
+        "content_type": "image/gif",
+        "text": "R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+      }
+    ],
+    "result":
+    [
+      {
+        "fields": [
+          {"short": true, "value": "<@userInHistory>", "title": "Closed by"},
           {"short": true, "value": "N/A", "title": "Story points"}
         ],
         "mrkdwn_in": ["fields"],

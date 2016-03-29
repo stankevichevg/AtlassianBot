@@ -108,7 +108,10 @@ def test_wrong_auth(bot):
                 'text': ':exclamation: Jira authentication error'}]
 
 
-@pytest.mark.parametrize('testdata', [(data['jiranotifier'])])
+@pytest.mark.parametrize('testdata', [
+                         (data['jiranotifier_changelog_with_assignee']),
+                         (data['jiranotifier_changelog_without_assignee'])
+                         ])
 def test_notifier(testdata):
     slack_mock = MagicMock()
     slack_mock.channels = {'channel_id': {'name': 'atlassianbot-test'}}
