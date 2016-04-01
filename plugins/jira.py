@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import inspect
 import re
@@ -18,7 +19,7 @@ from slackbot.bot import Bot, listen_to, respond_to
 from . import settings
 from utils.messages_cache import MessagesCache
 from utils.imageproxy import convert_proxyurl
-
+from utils.notifier_bot import NotifierBot, NotifierJob
 logger = logging.getLogger(__name__)
 
 MAX_NOTIFIERS_WORKERS = 2
@@ -146,147 +147,110 @@ class JiraBot(object):
         return issue + message.body['channel']
 
 
-class JiraNotifierBot(object):
+class JiraNotifierBot(NotifierBot):
     def __init__(self, server, config, slackclient=None):
-        logger.info('registered JiraNotifierBot')
+        super().__init__(slackclient)
 
         self.__server = server
 
-        if slackclient is None:
-            slackclient = self.__get_slackclient()
-        self.slackclient = slackclient
-
-        if self.slackclient is None:
-            logger.error('Unable to retrieve slackclient instance')
-            return
-
-        # Contains last issue for each notifier
-        self.__notifiers = {}
-
-        self._notifier_run_callback = None
-        self._executor = ThreadPoolExecutor(max_workers=MAX_NOTIFIERS_WORKERS)
         for notifier_settings in config['notifiers']:
             logger.info('registered JiraNotifierBot for query \'%s\' '
                         'on channel \'#%s\'',
                         notifier_settings['query'],
                         notifier_settings['channel'])
-            self._executor.submit(
-                self.__notifier_init,
-                notifier_settings,
-                config['polling_interval'])
+            self.submit(JiraNotifierJob(
+                                        self.__jira,
+                                        server['imageproxy'],
+                                        notifier_settings,
+                                        config['polling_interval']))
 
     @lazy
     def __jira(self):
         return get_Jira_instance(self.__server)
 
-    def __notifier_init(self, notifier_settings, polling_interval):
-        try:
-            channel_id = self.__get_channel(notifier_settings['channel'])
-            if channel_id is None:
-                logger.error('Unable to find channel')
-                return
 
-            # First query to retrieve last matching task
-            query = '{} AND status = Closed ORDER BY updated DESC'\
-                .format(notifier_settings['query'])
+class JiraNotifierJob(NotifierJob):
+    def __init__(self, jira, imageproxy, config, polling_interval):
+        super().__init__(config['channel'], polling_interval)
+        self.__jira = jira
+        self.__imageproxy = imageproxy
+        self.__config = config
 
-            results = self.__jira.search_issues(query, maxResults=1)
+    def init(self):
+        # First query to retrieve last matching task
+        query = '{} AND status = Closed ORDER BY updated DESC'\
+            .format(self.__config['query'])
 
-            if len(results) == 0:
-                logger.error('No initial issue found')
-                return
+        results = self.__jira.search_issues(query, maxResults=1)
 
-            self.__notifiers[frozenset(notifier_settings.items())] = results[0]
+        if len(results) == 0:
+            logger.error('No initial issue found')
+            return
 
-            self._executor.submit(
-                self.__notifier_run,
-                notifier_settings,
-                polling_interval,
-                channel_id)
-        except Exception as ex:
-            logger.error('Unable to init notifier: %s', ex, exc_info=True)
+        self.__last_result = results[0]
 
-    def __notifier_run(self, notifier_settings, polling_interval, channel_id):
-        Event().wait(polling_interval)
+    def run(self):
+        logger.info('run')
+        # Convert last issue update date
+        # to a compatible timestamp for Jira
+        date = arrow.get(self.__last_result.fields.updated)
 
-        try:
-            result = self.__notifiers[frozenset(notifier_settings.items())]
+        last_update = (date.timestamp + 1) * 1000
+        query = '{} AND status CHANGED TO Closed DURING({}, NOW()) '\
+                'ORDER BY updated DESC'\
+            .format(self.__config['query'], last_update)
 
-            # Convert last issue update date
-            # to a compatible timestamp for Jira
-            date = arrow.get(result.fields.updated)
+        fields = 'summary,customfield_10012,updated,issuetype,assignee'
+        results = self.__jira.search_issues(
+                        query,
+                        fields=fields,
+                        expand='changelog')
 
-            last_update = (date.timestamp + 1) * 1000
-            query = '{} AND status CHANGED TO Closed DURING({}, NOW()) '\
-                    'ORDER BY updated DESC'\
-                .format(notifier_settings['query'], last_update)
+        if len(results) > 0:
+            self.__last_result = results[0]
+            attachments = []
+            for issue in results[::-1]:
+                summary = issue.fields.summary.encode('utf8')
+                icon = convert_proxyurl(
+                                self.__imageproxy,
+                                issue.fields.issuetype.iconUrl)
 
-            fields = 'summary,customfield_10012,updated,issuetype'
-            results = self.__jira.search_issues(
-                            query,
-                            fields=fields,
-                            expand='changelog')
+                sps = self.__get_storypoints(issue)
+                sps = self.__formatvalue(sps)
 
-            if len(results) > 0:
-                self.__notifiers[frozenset(notifier_settings.items())] = results[0]
-                attachments = []
-                for issue in results[::-1]:
-                    summary = issue.fields.summary.encode('utf8')
-                    icon = convert_proxyurl(
-                                    self.__server['imageproxy'],
-                                    issue.fields.issuetype.iconUrl)
+                author = self.__get_author(issue)
+                author = self.__formatvalue(author)
 
-                    sps = self.__get_storypoints(issue)
-                    sps = self.__formatvalue(sps)
+                status = self.__get_status(issue)
+                status = self.__formatvalue(status)
 
-                    author = self.__get_author(issue)
-                    author = self.__formatvalue(author)
+                attachments.append({
+                    'fallback': '{key} - {summary}\n{url}'.format(
+                        key=issue.key,
+                        summary=summary.decode(),
+                        url=issue.permalink()
+                        ),
+                    'author_name': issue.key,
+                    'author_link': issue.permalink(),
+                    'author_icon': icon,
+                    'text': summary.decode(),
+                    'color': '#14892c',
+                    'mrkdwn_in': ['fields'],
+                    'fields': [
+                        {
+                            'title': '{} by'.format(status),
+                            'value': author,
+                            'short': True
+                        },
+                        {
+                            'title': 'Story points',
+                            'value': sps,
+                            'short': True
+                        }
+                    ],
 
-                    status = self.__get_status(issue)
-                    status = self.__formatvalue(status)
-
-                    attachments.append({
-                        'fallback': '{key} - {summary}\n{url}'.format(
-                            key=issue.key,
-                            summary=summary.decode(),
-                            url=issue.permalink()
-                            ),
-                        'author_name': issue.key,
-                        'author_link': issue.permalink(),
-                        'author_icon': icon,
-                        'text': summary.decode(),
-                        'color': '#14892c',
-                        'mrkdwn_in': ['fields'],
-                        'fields': [
-                            {
-                                'title': '{} by'.format(status),
-                                'value': author,
-                                'short': True
-                            },
-                            {
-                                'title': 'Story points',
-                                'value': sps,
-                                'short': True
-                            }
-                        ],
-
-                    })
-                self.slackclient.send_message(
-                    channel_id,
-                    '',
-                    attachments=json.dumps(attachments))
-
-            if self._notifier_run_callback is not None:
-                self._notifier_run_callback()
-
-        except Exception as ex:
-            logger.error('Unable to run notifier: %s', ex, exc_info=True)
-        finally:
-            self._executor.submit(
-                self.__notifier_run,
-                notifier_settings,
-                polling_interval,
-                channel_id)
+                })
+            self.send_message(attachments)
 
     def __get_storypoints(self, issue):
         if hasattr(issue.fields, 'customfield_10012') and \
@@ -326,6 +290,7 @@ class JiraNotifierBot(object):
                     return instance._client
 
     def __get_channel(self, channelname):
+        print(json.dumps(self.slackclient.channels))
         for id, channel in list(self.slackclient.channels.items()):
             if channel.get('name', None) == channelname:
                 return id
