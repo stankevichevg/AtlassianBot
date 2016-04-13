@@ -1,13 +1,10 @@
 # coding: utf-8
 
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
 import inspect
 import re
 import json
 import logging
 from itertools import filterfalse
-from threading import Event
 
 import arrow
 from jira import JIRA
@@ -152,17 +149,21 @@ class JiraNotifierBot(NotifierBot):
         super().__init__(slackclient)
 
         self.__server = server
+        self._jobs = list(self.submit_jobs(config))
 
+    def submit_jobs(self, config):
         for notifier_settings in config['notifiers']:
             logger.info('registered JiraNotifierBot for query \'%s\' '
                         'on channel \'#%s\'',
                         notifier_settings['query'],
                         notifier_settings['channel'])
-            self.submit(JiraNotifierJob(
-                                        self.__jira,
-                                        server['imageproxy'],
-                                        notifier_settings,
-                                        config['polling_interval']))
+            job = JiraNotifierJob(
+                                  self.__jira,
+                                  self.__server['imageproxy'],
+                                  notifier_settings,
+                                  config['polling_interval'])
+            self.submit(job)
+            yield job
 
     @lazy
     def __jira(self):

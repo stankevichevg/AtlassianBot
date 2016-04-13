@@ -5,6 +5,7 @@ import re
 import json
 from threading import Event
 
+import utils.notifier_bot as notifier_bot
 from .common import controlled_responses, get_message
 from plugins.jira import JiraBot, JiraNotifierBot
 from utils.messages_cache import MessagesCache
@@ -143,20 +144,20 @@ def test_notifier(testdata):
             body=json.dumps(testdata['requests'][0]['text']),
             content_type='application/json')
 
-        obj = JiraNotifierBot(server, conf, slack_mock)
-        event = Event()
+        with JiraNotifierBot(server, conf, slack_mock) as obj:
+            assert len(obj._jobs) == 1
+            event = Event()
 
-        def notifier_run():
-            obj._executor.shutdown(wait=False)
-            event.set()
+            def notifier_run():
+                event.set()
 
-        obj._notifier_run_callback = notifier_run
-        assert event.wait(timeout=5) is True
+            obj._jobs[0].run_callback = notifier_run
+            assert event.wait(timeout=5) is True
 
-        slack_mock.send_message.assert_called_once_with(
+            slack_mock.send_message.assert_called_once_with(
                                                         'channel_id',
                                                         '',
                                                         attachments=mock.ANY)
-        call = slack_mock.send_message.call_args
-        call_args, call_kwargs = call
-        assert testdata['result'] == json.loads(call_kwargs['attachments'])
+            call = slack_mock.send_message.call_args
+            call_args, call_kwargs = call
+            assert testdata['result'] == json.loads(call_kwargs['attachments'])
