@@ -2,6 +2,6 @@ venv/
 *.pyc
 local_settings.py
 plugins/settings.yml
-*.sublime-*
+*.sublime-workspace
 coverage_html
 .coverage

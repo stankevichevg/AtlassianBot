@@ -5,8 +5,8 @@ from mock import MagicMock
 from slackbot.dispatcher import Message
 
 
-def get_message(text=None):
-    message = Message(None, {'channel': 'channelid', 'text': text})
+def get_message(text=None, channel='channelid'):
+    message = Message(None, {'channel': channel, 'text': text})
     message.send_webapi = MagicMock()
     return message
 
@@ -43,15 +43,23 @@ class controlled_responses(object):
     def __add_responses(self):
         for request in self.requests_get:
             body = None
+            content_type = 'application/json'
+
+            if 'content_type' in request:
+                content_type = request['content_type']
+
             if 'text' in request:
-                body = json.dumps(request['text'])
+                if content_type.startswith('image/'):
+                    body = base64.b64decode(request['text'])
+                else:
+                    body = json.dumps(request['text'])
 
             self.rsps.add(
                 responses.GET,
                 request['url'],
                 status=request['code'],
                 body=body,
-                content_type='application/json',
+                content_type=content_type,
                 match_querystring=True)
 
     def __validate_auth_header(self):

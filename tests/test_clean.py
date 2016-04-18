@@ -1,8 +1,7 @@
 import pytest
 import json
 import re
-import responses
-from mock import MagicMock, mock
+from mock import MagicMock
 
 from plugins.clean import CleanBot
 from plugins.stash import Stash
@@ -104,11 +103,7 @@ def test_get_username(bot, id, result, exception):
 def test_generate_clean_tasks(bot, input, testdata):
     msg = get_message_with_user(input)
 
-    with controlled_responses(testdata['requests']) as rsps:
-        rsps.rsps.add(
-            responses.POST,
-            'http://host/rest/auth/1/session',
-            status=200)
+    with controlled_responses(testdata['requests']):
 
         bot.generate_clean_tasks(msg, input)
 

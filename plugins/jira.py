@@ -1,14 +1,12 @@
 # coding: utf-8
 
+from concurrent.futures import ThreadPoolExecutor
 import inspect
 import re
-import time
 import json
-from urllib.parse import urlparse, urlunparse
-import threading
+import logging
 from itertools import filterfalse
-from threading import Thread
-import sys
+from threading import Event
 
 import arrow
 from jira import JIRA
@@ -19,25 +17,26 @@ from slackbot.bot import Bot, listen_to, respond_to
 
 from . import settings
 from utils.messages_cache import MessagesCache
+from utils.imageproxy import convert_proxyurl
+
+logger = logging.getLogger(__name__)
+
+MAX_NOTIFIERS_WORKERS = 2
 
 
 def get_Jira_instance(server):
-    try:
-        return JIRA(
-            options={
-                'server': server['host'],
-                'verify': settings.servers.verify_ssl},
-            basic_auth=(
-                        server['username'],
-                        server['password']),
-            validate=True,
-            get_server_info=False,
-            max_retries=1
-        )
-    except JIRAError as ex:
-        if (ex.status_code == 401):
-            print('JIRA Authentication error')
-            sys.exit(-1)
+    auth = None
+    if 'username' in server and 'password' in server:
+        auth = (server['username'], server['password'])
+
+    return JIRA(
+        options={
+            'server': server['host'],
+            'verify': settings.servers.verify_ssl},
+        basic_auth=auth,
+        get_server_info=False,
+        max_retries=1
+    )
 
 
 class JiraBot(object):
@@ -68,28 +67,34 @@ class JiraBot(object):
 
     def close(self, key, user):
         issue = self.__jira.issue(key, fields='subtasks,status')
-        comment = 'Closed by AtlassianBot (Origin: {})'.format(user)
+        comment = 'Closed by AtlassianBot (Original user: {})'.format(user)
         for subtask in issue.fields.subtasks:
             if str(subtask.fields.status) != 'Closed':
                 self.__jira.transition_issue(
                     subtask,
                     'Closed',
-                    comment=comment
+                    comment=comment,
+                    assignee={'name': user}
                 )
 
         if str(issue.fields.status) != 'Closed':
             self.__jira.transition_issue(
                 issue,
                 'Closed',
-                comment=comment
+                comment=comment,
+                assignee={'name': user}
             )
 
     def display_issues(self, message):
         attachments = []
 
         issues = self.__jira_regex.findall(message.body['text'])
-        for issue in filterfalse(self.__cache.IsInCache, issues):
-            self.__cache.AddToCache(issue)
+
+        def filter_predicate(x):
+            return self.__cache.IsInCache(self.__get_cachekey(x, message))
+
+        for issue in filterfalse(filter_predicate, issues):
+            self.__cache.AddToCache(self.__get_cachekey(issue, message))
             issue_message = self.get_issue_message(issue)
             if issue_message is None:
                 issue_message = self.__get_issuenotfound_message(issue)
@@ -102,7 +107,9 @@ class JiraBot(object):
     def get_issue_message(self, key):
         try:
             issue = self.__jira.issue(key, fields='summary,issuetype')
-            icon = self.__replace_host(issue.fields.issuetype.iconUrl)
+            icon = convert_proxyurl(
+                                    self.__server['imageproxy'],
+                                    issue.fields.issuetype.iconUrl)
             summary = issue.fields.summary.encode('utf8')
             return {
                 'fallback': '{key} - {summary}\n{url}'.format(
@@ -116,8 +123,8 @@ class JiraBot(object):
                 'text': summary.decode(),
                 'color': '#59afe1'
             }
-        except JIRAError:
-            return None
+        except JIRAError as ex:
+            return self.__get_error_message(ex)
 
     def __get_issuenotfound_message(self, key):
         return {
@@ -127,71 +134,87 @@ class JiraBot(object):
             'color': 'warning'
         }
 
-    def __replace_host(self, url):
-        parsed = urlparse(url)
-        replaced = parsed._replace(netloc='jira.atlassian.com')
-        return urlunparse(replaced)
+    def __get_error_message(self, exception):
+        if (exception.status_code == 401):
+            return {
+                'fallback': 'Jira authentication error',
+                'text': ':exclamation: Jira authentication error',
+                'color': 'danger'
+            }
+
+    def __get_cachekey(self, issue, message):
+        return issue + message.body['channel']
 
 
 class JiraNotifierBot(object):
     def __init__(self, server, config, slackclient=None):
+        logger.info('registered JiraNotifierBot')
+
         self.__server = server
-        self.thread_started = threading.Event()
 
         if slackclient is None:
             slackclient = self.__get_slackclient()
         self.slackclient = slackclient
 
         if self.slackclient is None:
-            print('Unable to retrieve slackclient instance')
+            logger.error('Unable to retrieve slackclient instance')
             return
 
-        for notifier in config['notifiers']:
-            self.__init_notifier_thread(
-                slackclient,
-                notifier,
+        # Contains last issue for each notifier
+        self.__notifiers = {}
+
+        self._notifier_run_callback = None
+        self._executor = ThreadPoolExecutor(max_workers=MAX_NOTIFIERS_WORKERS)
+        for notifier_settings in config['notifiers']:
+            logger.info('registered JiraNotifierBot for query \'%s\' '
+                        'on channel \'#%s\'',
+                        notifier_settings['query'],
+                        notifier_settings['channel'])
+            self._executor.submit(
+                self.__notifier_init,
+                notifier_settings,
                 config['polling_interval'])
 
     @lazy
     def __jira(self):
         return get_Jira_instance(self.__server)
 
-    def __init_notifier_thread(self, slackclient, notifier, polling_interval):
-        thread = Thread(
-                        target=self.__notifier_run,
-                        args=(slackclient, notifier, polling_interval)
-                        )
-        thread.setDaemon(True)
-        thread.start()
-
-    def __notifier_run(self, slackclient, notifier_settings, polling_interval):
+    def __notifier_init(self, notifier_settings, polling_interval):
         try:
-            self.__notifier(slackclient, notifier_settings, polling_interval)
-        except SystemExit:
-            self.thread_started.set()
+            channel_id = self.__get_channel(notifier_settings['channel'])
+            if channel_id is None:
+                logger.error('Unable to find channel')
+                return
 
-    def __notifier(self, slackclient, notifier_settings, polling_interval):
-        channel_id = self.__get_channel(notifier_settings['channel'])
-        if channel_id is None:
-            print('Unable to find channel')
-            return
+            # First query to retrieve last matching task
+            query = '{} AND status = Closed ORDER BY updated DESC'\
+                .format(notifier_settings['query'])
 
-        # First query to retrieve last matching task
-        query = '{} AND status = Closed ORDER BY updated DESC'\
-            .format(notifier_settings['query'])
+            results = self.__jira.search_issues(query, maxResults=1)
 
-        results = self.__jira.search_issues(query, maxResults=1)
+            if len(results) == 0:
+                logger.error('No initial issue found')
+                return
 
-        if len(results) == 0:
-            print('No initial issue found')
-            return
+            self.__notifiers[frozenset(notifier_settings.items())] = results[0]
 
-        while True:
-            time.sleep(polling_interval)
+            self._executor.submit(
+                self.__notifier_run,
+                notifier_settings,
+                polling_interval,
+                channel_id)
+        except Exception as ex:
+            logger.error('Unable to init notifier: %s', ex, exc_info=True)
+
+    def __notifier_run(self, notifier_settings, polling_interval, channel_id):
+        Event().wait(polling_interval)
+
+        try:
+            result = self.__notifiers[frozenset(notifier_settings.items())]
 
             # Convert last issue update date
             # to a compatible timestamp for Jira
-            date = arrow.get(results[0].fields.updated)
+            date = arrow.get(result.fields.updated)
 
             last_update = (date.timestamp + 1) * 1000
             query = '{} AND status CHANGED TO Closed DURING({}, NOW()) '\
@@ -199,17 +222,19 @@ class JiraNotifierBot(object):
                 .format(notifier_settings['query'], last_update)
 
             fields = 'summary,customfield_10012,updated,issuetype'
-            new_results = self.__jira.search_issues(
+            results = self.__jira.search_issues(
                             query,
                             fields=fields,
                             expand='changelog')
 
-            if len(new_results) > 0:
-                results = new_results
+            if len(results) > 0:
+                self.__notifiers[frozenset(notifier_settings.items())] = results[0]
                 attachments = []
                 for issue in results[::-1]:
                     summary = issue.fields.summary.encode('utf8')
-                    icon = self.__replace_host(issue.fields.issuetype.iconUrl)
+                    icon = convert_proxyurl(
+                                    self.__server['imageproxy'],
+                                    issue.fields.issuetype.iconUrl)
 
                     sps = self.__get_storypoints(issue)
                     sps = self.__formatvalue(sps)
@@ -251,7 +276,17 @@ class JiraNotifierBot(object):
                     '',
                     attachments=json.dumps(attachments))
 
-            self.thread_started.set()
+            if self._notifier_run_callback is not None:
+                self._notifier_run_callback()
+
+        except Exception as ex:
+            logger.error('Unable to run notifier: %s', ex, exc_info=True)
+        finally:
+            self._executor.submit(
+                self.__notifier_run,
+                notifier_settings,
+                polling_interval,
+                channel_id)
 
     def __get_storypoints(self, issue):
         if hasattr(issue.fields, 'customfield_10012') and \
@@ -261,7 +296,15 @@ class JiraNotifierBot(object):
     def __get_author(self, issue):
         if len(issue.changelog.histories) > 0:
             event = issue.changelog.histories[-1]
-            author = event.author.name
+            # Search in history in we have a transition to Closed
+            # with a change of the assignee
+            # => it's probably a transition done by the bot
+            res = next((x for x in event.items if x.field == 'assignee'), None)
+            if res is not None:
+                author = res.to
+            else:
+                author = issue.fields.assignee.name
+
             return '<@{}>'.format(author)
 
     def __get_status(self, issue):
@@ -287,11 +330,6 @@ class JiraNotifierBot(object):
             if channel.get('name', None) == channelname:
                 return id
 
-    def __replace_host(self, url):
-        parsed = urlparse(url)
-        replaced = parsed._replace(netloc='jira.atlassian.com')
-        return urlunparse(replaced)
-
 
 if (settings.plugins.jiranotifier.enabled):
     JiraNotifierBot(settings.servers.jira, settings.plugins.jiranotifier)
@@ -302,8 +340,6 @@ instance = JiraBot(MessagesCache(),
 
 
 if (settings.plugins.jirabot.enabled):
-    print('Jira init')
-
     @listen_to(instance.get_pattern(), re.IGNORECASE)
     @respond_to(instance.get_pattern(), re.IGNORECASE)
     def jirabot(message, _):

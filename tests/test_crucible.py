@@ -61,10 +61,28 @@ def test_display_reviews(bot, input, testdata):
         assert args[0] is ''
         assert json.loads(args[1]) == testdata['result']
 
-        # Second call should not display message again
-        message.send_webapi.reset_mock()
+
+@pytest.mark.parametrize('input,testdata', [
+                         ('CRUA-1', data['display_reviews_CRUA-1']),
+                         ('CRUA-2', data['display_reviews_CRUA-2']),
+                         ])
+def test_messages_cache(bot, input, testdata):
+    with controlled_responses(testdata['requests']):
+        # First call should display message
+        message = get_message(input, channel='channel1')
+        bot.display_reviews(message)
+        assert message.send_webapi.called
+
+        # Second call on same channel should not display message again
+        message = get_message(input, channel='channel1')
         bot.display_reviews(message)
         assert not message.send_webapi.called
+
+    with controlled_responses(testdata['requests']):
+        # Call on another channel should display the message again
+        message = get_message(input, channel='channel2')
+        bot.display_reviews(message)
+        assert message.send_webapi.called
 
 
 @pytest.mark.parametrize('input,testdata', [
