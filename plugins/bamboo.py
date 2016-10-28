@@ -16,8 +16,23 @@ class BambooBot(object):
 
     def get_pattern(self):
         bamboo_prefixes = '|'.join(self.__prefixes)
-        return r'^UP .*\<?((?:{})-[\w]+)(?:-\d+)?/?\>?'\
-            .format(bamboo_prefixes)
+        plan_regex = '(?P<plan>(?:{})-[\w]+)(?:-\d+)?/?'.format(bamboo_prefixes)
+        deployment_regex = 'viewDeploymentResult.action\?deploymentResultId=(?P<deployment>\d+)'
+        return '^UP .*\<?(?:{}|{})\>?'\
+            .format(plan_regex, deployment_regex)
+
+    def move_deployment(self, message, deploymentid):
+        key = self.__get_deployment_key(deploymentid)
+        if key is None:
+            message.reply_webapi('Deployment {} doesn\'t exists'.format(deploymentid))
+            return
+        else:
+            message.reply_webapi('Yes my lord. I\'m looking for deployment plan to move...')
+            moved = self.__move_top(key, 'DEPLOYMENT')
+            if moved:
+                message.reply_webapi('Moved deployment {}'.format(deploymentid))
+            else:
+                message.reply_webapi('Unable to move deployment {} '.format(deploymentid))
 
     def move_plan(self, message, plankey):
         if self.__plan_exist(plankey) is False:
@@ -31,7 +46,7 @@ class BambooBot(object):
             resultkeys = list(self.__find_matching_builds(builds, plankey))
             if resultkeys:
                 for resultkey, index in resultkeys[::-1]:
-                    self.__move_top(resultkey)
+                    self.__move_top(resultkey, 'BUILD')
 
                 message.reply_webapi('Moved {} jobs'.format(len(resultkeys)))
             else:
@@ -41,20 +56,27 @@ class BambooBot(object):
             message.reply_webapi(
                 'I\'m not a Bamboo administrator and cannot move jobs')
 
-    def __move_top(self, resultkey):
+    def __move_top(self, resultkey, type):
         request = rest.post(
             self.__server,
             '/build/admin/ajax/reorderBuild.action',
             data={
                 'resultKey': resultkey,
                 'prevResultKey': '',
-                'itemType': 'BUILD'
+                'itemType': type
             }
         )
 
         if request.status_code == requests.codes.ok:
-            if request.json()['status'] != 'OK':
-                raise Exception('Unknown error')
+            json = request.json()
+            if json['status'] == 'OK':
+                return True
+
+            # Deployment plan cannot be moved
+            if json['status'] == 'ERROR' and json['errors'][0] == 'Queue out of order':
+                return False
+
+            raise Exception('Unknown error')
         elif request.status_code == requests.codes.server_error:
             raise Exception('Not authorized')
         else:
@@ -70,6 +92,17 @@ class BambooBot(object):
             request.raise_for_status()
 
         return False
+
+    def __get_deployment_key(self, deploymentid):
+        request = rest.get(
+            self.__server,
+            '/rest/api/latest/deploy/result/{}'.format(deploymentid))
+        if request.status_code == requests.codes.ok:
+            return request.json()['key']['key']
+        elif request.status_code != 404:
+            request.raise_for_status()
+
+        return None
 
     def find_matching_branches(self, plankey, searched_term):
         request = rest.get(
@@ -129,5 +162,13 @@ instance = BambooBot(settings.servers.bamboo,
 
 if (settings.plugins.bamboobot.enabled):
     @respond_to(instance.get_pattern(), re.IGNORECASE)
-    def bamboobot(message, plankey):
-        instance.move_plan(message, plankey)
+    def bamboobot(message, plankey, other):
+        result = re.search(instance.get_pattern(), message.body['text'], re.IGNORECASE)
+
+        plankey = result.group('plan')
+        if plankey is not None:
+            instance.move_plan(message, plankey)
+
+        deployment = result.group('deployment')
+        if deployment is not None:
+            instance.move_deployment(message, deployment)

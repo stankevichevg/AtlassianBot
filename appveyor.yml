@@ -31,7 +31,7 @@ install:
   - "pip install codecov"
 
   # Install ImageMagick
-  - choco install imagemagick.app -y %IMAGEMAGICK_PLATFORM%
+  - choco install imagemagick.app --version 6.9.6.2 -y %IMAGEMAGICK_PLATFORM%
 
 build: off
 
