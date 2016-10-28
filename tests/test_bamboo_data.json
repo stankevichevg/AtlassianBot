@@ -128,6 +128,32 @@
       "Moved 2 jobs"
     ]
   },
+  "move_deployment_inqueue":
+  {
+    "requests":
+    [
+      {
+        "url": "http://host/rest/api/latest/deploy/result/123",
+        "code": 200,
+        "text":
+        {
+          "key":
+          {
+            "key": "456-789-123"
+          }
+        }
+      }
+    ],
+    "post_result":
+    [
+      "resultKey=456-789-123&prevResultKey=&itemType=DEPLOYMENT"
+    ],
+    "result":
+    [
+      "Yes my lord. I'm looking for deployment plan to move...",
+      "Moved deployment 123"
+    ]
+  },
   "find_matching_branches":
   {
     "requests":

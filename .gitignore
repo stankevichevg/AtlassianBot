@@ -5,3 +5,4 @@ plugins/settings.yml
 *.sublime-workspace
 coverage_html
 .coverage
+.idea/

@@ -35,13 +35,20 @@ def bot():
     ('UP http://host/browse/BAMA-DEV-JOB-123', 'BAMA-DEV'),
     ('UP http://host/browse/BAMA-DEV123-123', 'BAMA-DEV123'),
     ('UP http://host/browse/BAMA-DEV123-JOB-123', 'BAMA-DEV123'),
+    ('UP http://host/deploy/viewDeploymentResult.action?deploymentResultId=123456789', '123456789'),
 ])
 def test_bamboopattern(bot, input, expected):
     result = re.search(bot.get_pattern(), input, re.IGNORECASE)
     if expected is None:
         assert result == expected
     else:
-        assert result.group(1) == expected
+        plan = result.group('plan')
+        if plan is not None:
+            assert plan == expected
+
+        deployment = result.group('deployment')
+        if deployment is not None:
+            assert deployment == expected
 
 
 @pytest.mark.parametrize('testdata', [
@@ -96,6 +103,31 @@ def test_move_plan(bot, testdata):
 
         [msg.send_webapi.assert_any_call(x, attachments=None, as_user=True) for x in testdata['result']]
 
+
+@pytest.mark.parametrize('testdata', [
+    (data['move_deployment_inqueue'])
+])
+def test_move_deployment(bot, testdata):
+    with controlled_responses(testdata['requests'], server) as rsps:
+        rsps.add_post(
+            'http://host/build/admin/ajax/reorderBuild.action',
+            200,
+            {'status': 'OK'})
+
+        msg = get_message()
+        bot.move_deployment(msg, '123')
+
+        expDict = parse_qs(
+            testdata['post_result'][0],
+            keep_blank_values=True,
+            strict_parsing=True)
+        resDict = parse_qs(
+            rsps.calls[1].request.body,
+            keep_blank_values=True,
+            strict_parsing=True)
+        assert expDict == resDict
+
+        [msg.send_webapi.assert_any_call(x, attachments=None, as_user=True) for x in testdata['result']]
 
 @pytest.mark.parametrize('code,status,exception,errmsg', [
     (403, 'OK', requests.exceptions.HTTPError, '403 Client Error: None for url: http://host/build/admin/ajax/reorderBuild.action'),
