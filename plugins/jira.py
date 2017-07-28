@@ -13,6 +13,7 @@ from lazy import lazy
 
 from slackbot.bot import Bot, listen_to, respond_to
 
+from plugins.jira_utils import get_Jira_instance
 from . import settings
 from utils.messages_cache import MessagesCache
 from utils.imageproxy import convert_proxyurl
@@ -20,21 +21,6 @@ from utils.notifier_bot import NotifierBot, NotifierJob
 logger = logging.getLogger(__name__)
 
 MAX_NOTIFIERS_WORKERS = 2
-
-
-def get_Jira_instance(server):
-    auth = None
-    if 'username' in server and 'password' in server:
-        auth = (server['username'], server['password'])
-
-    return JIRA(
-        options={
-            'server': server['host'],
-            'verify': settings.servers.verify_ssl},
-        basic_auth=auth,
-        get_server_info=False,
-        max_retries=1
-    )
 
 
 class JiraBot(object):

@@ -11,6 +11,30 @@ plugins:
     - query: project = PROJECTKEY AND issuetype NOT IN subtaskIssueTypes()
       channel: channel
 
+    jirawatchbot:
+    enabled: Yes
+    polling_interval: 15
+    watchers:
+    - type: developer
+      enabled: Yes
+      polling_interval: 15
+      channel: testwatchbot
+      users:
+      - jira_login: login
+        slack_login: login
+      rules:
+      - type: notify
+        active_from: 5
+        active_to: 6
+        text: Please, close the task!!!
+        query: project = PROJECTKEY AND status = Develop
+      - type: transition
+        active_from: 4
+        active_to: 5
+        text: Closing the task
+        transition_name: Stop
+        query: project = PROJECTKEY AND status = Develop
+
   bamboobot:
     enabled: No
     prefixes: [ PLANKEY1, PLANKEY2 ]
@@ -41,6 +65,8 @@ servers:
     # Remove username and password for anonymous login
     username: &default_username username
     password: &default_password password
+    # http_proxy: http_proxy_address
+    # https_proxy: https_proxy_address
 
     # Image proxy server is used to display issue type icons on Slack
     # This server has two purpose:
