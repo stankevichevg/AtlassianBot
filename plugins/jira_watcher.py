@@ -10,9 +10,11 @@ from slackbot.bot import listen_to
 from plugins import settings
 from plugins.jira_utils import get_Jira_instance
 from utils.notifier_bot import NotifierBot, NotifierJob
+
 logger = logging.getLogger(__name__)
 
 MAX_NOTIFIERS_WORKERS = 2
+
 
 class JiraUserWatcherBot(NotifierBot):
     def __init__(self, server, config, slackclient=None, suppression=None):
@@ -42,7 +44,7 @@ class WatcherRule():
         self.active_to = config['active_to']
         self.query = config['query']
         self.text = config['text']
-        self.only_out_work_hours = config['only_out_work_hours'] == 'true'
+        self.only_out_work_hours = config['only_out_work_hours'] == True
 
     def apply(self, config_users, suppression):
         if self.__is_active():
@@ -52,6 +54,8 @@ class WatcherRule():
                     users.append({
                         'jira_login': user['jira_login'],
                         'slack_login': user['slack_login'],
+                        'work_from': user['work_from'],
+                        'work_to': user['work_to'],
                         'tasks': []
                     })
             fields = 'summary,customfield_10012,updated,issuetype,assignee'
@@ -85,7 +89,7 @@ class WatcherRule():
                                 'short': True
                             }
                         ]
-                        })
+                    })
         return attachments
 
     def is_triggered(self, user):
@@ -103,7 +107,9 @@ class NotifyWatcherRule(WatcherRule):
         super().__init__(jira, "notify", config)
 
     def is_triggered(self, user):
-        return user['tasks'] is not None and len(user['tasks']) > 0
+        return user['tasks'] is not None and len(user['tasks']) > 0 and \
+               (not self.only_out_work_hours or not user['work_from'] <= dt.datetime.now().hour <= user['work_to'])
+
 
 class TransitionWatcherRule(WatcherRule):
     def __init__(self, jira, config):
@@ -176,20 +182,25 @@ class UsersWatcherJob(NotifierJob):
         if len(attachments) > 0:
             self.send_message(attachments)
 
+
 notification_suppression = {}
 
 if (settings.plugins.jirawatchbot.enabled):
     def get_pattern(text):
         jira_prefixes = '|'.join(settings.plugins.jirawatchbot.prefixes)
-        return r'(?:^|\s|[\W]+)(?<!CLEAN\s)((?:{})-[\d]+)(?:$|\s|[\W]+) (?:{})'\
+        return r'(?:^|\s|[\W]+)(?<!CLEAN\s)((?:{})-[\d]+)(?:$|\s|[\W]+) (?:{})' \
             .format(jira_prefixes, text)
+
+
     JiraUserWatcherBot(settings.servers.jira, settings.plugins.jirawatchbot, suppression=notification_suppression)
+
 
     @listen_to('отстань', re.IGNORECASE)
     def jirabot(message):
         user = message.channel._client.users[message.body['user']][u'name']
-        notification_suppression.update({user : dt.datetime.now() + dt.timedelta(minutes=30)})
+        notification_suppression.update({user: dt.datetime.now() + dt.timedelta(minutes=30)})
         message.reply('Прошу прощения за беспокойство, мой господин. Вернусь через 30 минут')
+
 
     @listen_to('отвянь', re.IGNORECASE)
     def jirabot(message):
@@ -197,17 +208,20 @@ if (settings.plugins.jirawatchbot.enabled):
         notification_suppression.update({user: dt.datetime.now() + dt.timedelta(minutes=60)})
         message.reply('Прошу прощения за беспокойство, мой господин. Вернусь через час')
 
+
     @listen_to('работаю', re.IGNORECASE)
     def jirabot(message):
         user = message.channel._client.users[message.body['user']][u'name']
-        notification_suppression.update({user : dt.datetime.now() + dt.timedelta(minutes=30)})
+        notification_suppression.update({user: dt.datetime.now() + dt.timedelta(minutes=30)})
         message.reply('Вернусь через 30 минут')
+
 
     @listen_to('работаю час', re.IGNORECASE)
     def jirabot(message):
         user = message.channel._client.users[message.body['user']][u'name']
         notification_suppression.update({user: dt.datetime.now() + dt.timedelta(minutes=60)})
         message.reply('Вернусь через час')
+
 
     @listen_to('работаю два часа', re.IGNORECASE)
     def jirabot(message):
